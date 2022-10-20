@@ -176,7 +176,6 @@ public class Solution {
         if (root == null) return true;
         return check(root.left, root.right); // 判断根节点的左右子树是否对称
     }
-
     private boolean check(TreeNode left, TreeNode right) {
         if (left == null && right == null) return true; // 先判断当前两个子树的根节点是否满足对称条件
         if (left == null || right == null) return false;
@@ -184,5 +183,98 @@ public class Solution {
 
         return check(left.left, right.right) && check(left.right, right.left); // 再递归判断左左和右右 左右和右左是否满足条件
 
+    }
+
+    /**
+     * 给定一个二叉树，找出其最大深度。
+     * 二叉树的深度为根节点到最远叶子节点的最长路径上的节点数。
+     * 说明: 叶子节点是指没有子节点的节点。
+     * 示例：
+     * 给定二叉树 [3,9,20,null,null,15,7]，
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回它的最大深度 3 。
+     */
+    public int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        if (root.left == null && root.right == null) return 1;
+        return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+    }
+
+    /**
+     * 给定一个数组 prices ，它的第 i 个元素 prices[i] 表示一支给定股票第 i 天的价格。
+     * 你只能选择 某一天 买入这只股票，并选择在 未来的某一个不同的日子 卖出该股票。设计一个算法来计算你所能获取的最大利润。
+     * 返回你可以从这笔交易中获取的最大利润。如果你不能获取任何利润，返回 0 。
+     * 示例 1：
+     * 输入：[7,1,5,3,6,4]
+     * 输出：5
+     * 解释：在第 2 天（股票价格 = 1）的时候买入，在第 5 天（股票价格 = 6）的时候卖出，最大利润 = 6-1 = 5 。
+     *      注意利润不能是 7-1 = 6, 因为卖出价格需要大于买入价格；同时，你不能在买入前卖出股票。
+     * 示例 2：
+     * 输入：prices = [7,6,4,3,1]
+     * 输出：0
+     * 解释：在这种情况下, 没有交易完成, 所以最大利润为 0。
+     */
+    public int maxProfit(int[] prices) { // TODO: 2022/10/20 看就完了
+        /*int max = Integer.MIN_VALUE;
+        for (int i = 0; i < prices.length - 1; i++) {
+            for (int j = i + 1; j < prices.length; j++) {
+                max = Math.max((prices[j] - prices[i]), max);
+            }
+        }
+        return Math.max(max, 0);*/ // 自己写的暴力求解时间复杂度太高
+        /**
+         * 肯定要在历史价格最低的时候购入，在未来价格最高的时候卖出，这样利润就最大了
+         * 因此可以定义两个变量，minCost和maxProfit
+         */
+        int minCost = Integer.MAX_VALUE;
+        int maxProfit = 0;
+        for (int price : prices) {
+            if (price < minCost) minCost = price; // 这一天比之前的价格要低，我就这一天买入
+            else maxProfit = Math.max(maxProfit, price - minCost); // 这一天的价格比成本高，比较这一天卖出和之前所记录的最大利润
+        }
+        return maxProfit;
+    }
+
+    /**
+     * 给定一个非空整数数组，除了某个元素只出现一次以外，其余每个元素均出现两次。找出那个只出现了一次的元素。
+     * 说明：你的算法应该具有线性时间复杂度。 你可以不使用额外空间来实现吗？
+     * 示例 1:
+     * 输入: [2,2,1]
+     * 输出: 1
+     * 示例 2:
+     * 输入: [4,1,2,1,2]
+     * 输出: 4
+     */
+    public int singleNumber(int[] nums) { // TODO: 2022/10/20 位运算 太骚了！
+        /*Map<Integer, Integer> map = new HashMap<>();
+        for (int num : nums) {
+            if (map.containsKey(num)) {
+                Integer value = map.get(num);
+                map.put(num, ++value);
+            }else {
+                map.put(num, 1);
+            }
+        }
+        Set<Integer> keySet = map.keySet();
+        for (Integer key : keySet) {
+            Integer value = map.get(key);
+            if (value == 1) return key;
+        }
+        return -1;*/ // hash能做，但是时间复杂度不满足要求
+        /**
+         * 使用位运算。对于这道题，可使用异或运算 ⊕。异或运算有以下三个性质。
+         *  任何数和 0 做异或运算，结果仍然是原来的数，即 a⊕0=a。
+         *  任何数和其自身做异或运算，结果是 0，即 a⊕a=0。
+         *  异或运算满足交换律和结合律，即 a⊕b⊕a=b⊕a⊕a=b⊕(a⊕a)=b⊕0=b。
+         */
+        int res = 0;
+        for (int num : nums) {
+            res = res ^ num;
+        }
+        return res;
     }
 }
