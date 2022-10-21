@@ -277,4 +277,94 @@ public class Solution {
         }
         return res;
     }
+
+    /**
+     * 给你一个链表的头节点 head ，判断链表中是否有环。
+     * 如果链表中有某个节点，可以通过连续跟踪 next 指针再次到达，则链表中存在环。
+     */
+    public boolean hasCycle(ListNode head) { // TODO: 2022/10/21 快慢指针，又学到了，思想就是如果走的快的指针能和走得慢的指针相遇，说明链表中存在环，也就是慢的被套圈了
+        if (head == null || head.next == null) return false;
+        /*List<ListNode> list = new ArrayList<>(); // 也可以用set来判断当前节点是否被访问过
+        ListNode tmp = head;
+        while (tmp != null){
+            if (list.contains(tmp.next)) return true;
+            list.add(tmp);
+            tmp = tmp.next;
+        }
+        return false;*/
+        ListNode slow = head;
+        ListNode fast = head.next;
+        while (slow != fast) {
+            if (fast == null || fast.next == null) { // 快的最后是null，走到了末尾，也就说明没有圈
+                return false;
+            }
+            slow = slow.next; // 慢的走一步，快的走两步
+            fast = fast.next.next;
+        }
+        return true; // 退出循环的时候。slow == fast，相遇了，说明有圈
+    }
+
+    /**
+     * 给你两个单链表的头节点 headA 和 headB ，请你找出并返回两个单链表相交的起始节点。如果两个链表不存在相交节点，返回 null 。
+     */
+    public ListNode getIntersectionNode(ListNode headA, ListNode headB) {
+        if (headA == null || headB == null) return null;
+        ListNode tmpA = headA, tmpB = headB;
+        /*while (tmpA != tmpB){
+            if (tmpA == null) tmpA = headB;
+            if (tmpB == null) tmpB = headA;
+            if (tmpA == tmpB) break;
+            tmpA = tmpA.next;
+            tmpB = tmpB.next;
+        }*/
+        // TODO: 2022/10/21 while中的代码可以优化
+        while (tmpA != tmpB){
+            tmpA = tmpA != null ? tmpA.next : headB;
+            tmpB = tmpB != null ? tmpB.next : headA;
+        }
+        return tmpA;
+    }
+
+    /**
+     * 给定一个大小为 n 的数组 nums ，返回其中的多数元素。多数元素是指在数组中出现次数 大于 ⌊ n/2 ⌋ 的元素。
+     * 你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+     * 示例 1：
+     * 输入：nums = [3,2,3]
+     * 输出：3
+     * 示例 2：
+     * 输入：nums = [2,2,1,1,1,2,2]
+     * 输出：2
+     */
+    public int majorityElement(int[] nums) {
+//        Arrays.sort(nums);
+        /*for (int i = 0; i < nums.length-1; i++) {
+            for (int j = 0; j < nums.length-i-1; j++) {
+                if (nums[j] > nums[j+1]){
+                    int tmp = nums[j];
+                    nums[j] = nums[j+1];
+                    nums[j+1] = tmp;
+                }
+            }
+        }
+        return nums[nums.length/2];*/ // 是解法的一种，优化方面就在对数组的排序上
+        // TODO: 2022/10/21 投票法
+        /**
+         * “同归于尽消杀法” ：
+         *    由于多数超过50%, 比如100个数，那么多数至少51个，剩下少数是49个。
+         *    第一个到来的士兵，直接插上自己阵营的旗帜占领这块高地，此时领主 winner 就是这个阵营的人，现存兵力 count = 1。
+         *    如果新来的士兵和前一个士兵是同一阵营，则集合起来占领高地，领主不变，winner 依然是当前这个士兵所属阵营，现存兵力 count++；
+         *    如果新来到的士兵不是同一阵营，则前方阵营派一个士兵和它同归于尽。 此时前方阵营兵力count --。（即使双方都死光，这块高地的旗帜 winner 依然不变，因为已经没有活着的士兵可以去换上自己的新旗帜）
+         *    当下一个士兵到来，发现前方阵营已经没有兵力，新士兵就成了领主，winner 变成这个士兵所属阵营的旗帜，现存兵力 count ++。
+         *  就这样各路军阀一直以这种以一敌一同归于尽的方式厮杀下去，直到少数阵营都死光，那么最后剩下的几个必然属于多数阵营，winner 就是多数阵营。
+         */
+        int winner = nums[0], count = 1; // 默认地盘是数组中的第一个人的，初始兵力数为1
+        for (int i = 1; i < nums.length; i++) {
+            if (winner == nums[i]) count++; // 来的人和我是一伙的，兵力数+1
+            else if (count == 0) { // 我方兵力已经没了，这个地盘现在谁来就归谁
+                winner = nums[i];
+                count++;
+            }else count--; // 来的人和我不是一伙的，派一个人和他同归于尽，兵力数-1
+        }
+        return winner;
+    }
 }
