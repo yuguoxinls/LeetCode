@@ -367,4 +367,153 @@ public class Solution {
         }
         return winner;
     }
+
+    /**
+     * 给你单链表的头节点 head ，请你反转链表，并返回反转后的链表。
+     * 输入：head = [1,2,3,4,5]
+     * 输出：[5,4,3,2,1]
+     * 输入：head = []
+     * 输出：[]
+     */
+    public ListNode reverseList(ListNode head) {
+        if (head == null) return null;
+        ListNode cur = head, pre = null;
+        while (cur != null){
+            ListNode tmp = cur.next;
+            cur.next = pre;
+            pre = cur;
+            cur = tmp;
+        }
+        return pre;
+    }
+
+    /**
+     * 给你一棵二叉树的根节点 root ，翻转这棵二叉树，并返回其根节点。
+     */
+    public TreeNode invertTree(TreeNode root) {
+        if (root == null) return null;
+        TreeNode tmp = root.left;
+        root.left = invertTree(root.right);
+        root.right = invertTree(tmp);
+        return root;
+    }
+
+    /**
+     * 给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返回 true ；否则，返回 false 。
+     */
+    public boolean isPalindrome(ListNode head) { // TODO: 2022/10/23 官方题解 3 种方法，感觉都不是很优雅
+        if (head == null || head.next == null) return true;
+        Stack<Integer> stack = new Stack<>();
+        int len = 0;
+        ListNode tmp = head;
+        while (tmp != null){
+            len++;
+            stack.push(tmp.val);
+            tmp = tmp.next;
+        }
+        int step = len/2;
+        tmp = head;
+        while (step > 0){
+            step--;
+            if (stack.pop() != tmp.val) return false;
+            tmp = tmp.next;
+        }
+        return true;
+    }
+
+    /**
+     * 给定一个数组 nums，编写一个函数将所有 0 移动到数组的末尾，同时保持非零元素的相对顺序。
+     * 请注意 ，必须在不复制数组的情况下原地对数组进行操作。
+     * 示例 1:
+     * 输入: nums = [0,1,0,3,12]
+     * 输出: [1,3,12,0,0]
+     * 示例 2:
+     * 输入: nums = [0]
+     * 输出: [0]
+     */
+    public void moveZeroes(int[] nums) {
+        // TODO: 2022/10/23 2 种方法，1.是记录有多少个 0 ，不交换，直接在数组最后填上0的个数
+        // 下面展示方法2，双指针
+        int n = nums.length, left = 0, right = 0;
+        while (right < n) {
+            if (nums[right] != 0) {
+                swap(nums, left, right);
+                left++;
+            }
+            right++;
+        }
+    }
+    public void swap(int[] nums, int left, int right) {
+        int temp = nums[left];
+        nums[left] = nums[right];
+        nums[right] = temp;
+    }
+
+    /**
+     * 给你一个整数 n ，对于 0 <= i <= n 中的每个 i ，计算其二进制表示中 1 的个数 ，返回一个长度为 n + 1 的数组 ans 作为答案。
+     * 输入：n = 5
+     * 输出：[0,1,1,2,1,2]
+     * 解释：
+     *  0 --> 0
+     *  1 --> 1
+     *  2 --> 10
+     *  3 --> 11
+     *  4 --> 100
+     *  5 --> 101
+     */
+    public int[] countBits(int n) {
+        int[] ans = new int[n + 1];
+        ans[0] = 0;
+        for (int i = 1; i <= n; i++) {
+            int res = 0, j = i;
+            while(j != 0) { // TODO: 2022/10/23 二进制数中 “1” 的个数
+                res += j & 1;
+                j >>>= 1;
+            }
+            ans[i] = res;
+        }
+        return ans;
+    }
+
+    /**
+     * 给你一个含 n 个整数的数组 nums ，其中 nums[i] 在区间 [1, n] 内。
+     * 请你找出所有在 [1, n] 范围内但没有出现在 nums 中的数字，并以数组的形式返回结果。
+     * 输入：nums = [4,3,2,7,8,2,3,1]
+     * 输出：[5,6]
+     */
+    public List<Integer> findDisappearedNumbers(int[] nums) {
+        /*if (nums == null || nums.length == 0) return new ArrayList<>();
+        List<Integer> help = new ArrayList<>();
+        for (int i = 1; i <= nums.length; i++) {
+            help.add(i);
+        }
+        for (int num : nums) {
+            if (help.contains(num)) help.remove((Object) num);
+        }
+        return help;*/ // 会超时
+        List<Integer> ans = new ArrayList<>(); // TODO: 2022/10/23
+        Set<Integer> set = new HashSet<>();
+        for (int num : nums) {
+            set.add(num);
+        }
+        for (int i = 1; i <= nums.length; i++) {
+            if (!set.contains(i)) ans.add(i);
+        }
+        return ans;
+    }
+
+    /**
+     * 两个整数之间的 汉明距离 指的是这两个数字对应二进制位不同的位置的数目。
+     * 给你两个整数 x 和 y，计算并返回它们之间的汉明距离。
+     */
+    public int hammingDistance(int x, int y) {
+        int ans = x ^ y;
+        if (ans == 0) return 0;
+        int count = 0;
+        while (ans != 0){
+            count += ans & 1;
+            ans >>>= 1;
+        }
+        return count;
+    }
 }
