@@ -516,4 +516,50 @@ public class Solution {
         }
         return count;
     }
+
+    /**
+     * 给定一棵二叉树，你需要计算它的直径长度。一棵二叉树的直径长度是任意两个结点路径长度中的最大值。这条路径可能穿过也可能不穿过根结点。
+     * 示例 :
+     * 给定二叉树
+     *           1
+     *          / \
+     *         2   3
+     *        / \
+     *       4   5
+     * 返回 3, 它的长度是路径 [4,2,1,3] 或者 [5,2,1,3]。
+     * 注意：两结点之间的路径长度是以它们之间边的数目表示。
+     */
+    // TODO: 2022/10/24 官方题解，没太看懂
+    int ans;
+    public int diameterOfBinaryTree(TreeNode root) {
+        ans = 1;
+        depth(root);
+        return ans - 1;
+    }
+    public int depth(TreeNode node) {
+        if (node == null) {
+            return 0; // 访问到空节点了，返回0
+        }
+        int L = depth(node.left); // 左儿子为根的子树的深度
+        int R = depth(node.right); // 右儿子为根的子树的深度
+        ans = Math.max(ans, L+R+1); // 计算d_node即L+R+1 并更新ans
+        return Math.max(L, R) + 1; // 返回该节点为根的子树的深度
+    }
+
+    /**
+     * 给你两棵二叉树： root1 和 root2
+     * 想象一下，当你将其中一棵覆盖到另一棵之上时，两棵树上的一些节点将会重叠（而另一些不会）。你需要将这两棵树合并成一棵新二叉树。
+     * 合并的规则是：如果两个节点重叠，那么将这两个节点的值相加作为合并后节点的新值；否则，不为 null 的节点将直接作为新二叉树的节点。
+     * 返回合并后的二叉树。
+     * 注意: 合并过程必须从两个树的根节点开始。
+     */
+    // TODO: 2022/10/24 官方题解
+    public TreeNode mergeTrees(TreeNode root1, TreeNode root2) {
+        if (root1 == null) return root2;
+        if (root2 == null) return root1;
+        TreeNode merged = new TreeNode(root1.val+root2.val);
+        merged.left = mergeTrees(root1.left, root2.left);
+        merged.right = mergeTrees(root1.right, root2.right);
+        return merged;
+    }
 }
