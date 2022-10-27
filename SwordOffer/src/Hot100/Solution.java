@@ -619,7 +619,7 @@ public class Solution {
         for (int i = 0; i < n; ++i) {
             if (i != 0) {
                 // 左指针向右移动一格，移除一个字符
-                occ.remove(s.charAt(i - 1));
+                occ.remove(s.charAt(i - 1)); // 注意，是无序集合，因此不能根据索引删除，要根据具体对象删除
             }
             while (rk + 1 < n && !occ.contains(s.charAt(rk + 1))) {
                 // 不断地移动右指针
@@ -630,5 +630,60 @@ public class Solution {
             ans = Math.max(ans, rk - i + 1);
         }
         return ans;
+    }
+
+    /**
+     *给你一个字符串 s，找到 s 中最长的回文子串。
+     * 示例 1：
+     * 输入：s = "babad"
+     * 输出："bab"
+     * 解释："aba" 同样是符合题意的答案。
+     * 示例 2：
+     * 输入：s = "cbbd"
+     * 输出："bb"
+     */
+    /*public String longestPalindrome(String s) {
+        char[] chars = s.toCharArray();
+        String bestRes = "";
+        for (int l = 0; l < s.length(); l++) {
+            StringBuilder curRes = new StringBuilder();
+            for (int r = l; r < s.length(); r++) {
+                curRes.append(chars[r]);
+                if (!isHuiWen(curRes)) continue;
+                bestRes = curRes.length() > bestRes.length() ? curRes.toString() : bestRes;
+            }
+        }
+        return bestRes;
+    }
+    private boolean isHuiWen(StringBuilder res) {
+        if (res.length() == 1) return true;
+        int i = 0, j = res.length() - 1;
+        while (i <= j){
+            if (res.charAt(i++) != res.charAt(j--)) return false;
+        }
+        return true;
+    }*/ // TODO: 2022/10/27 自己写的复杂度太高 应用中心扩展法
+    int start = -1, end = 0, maxLen = 0;
+    public String longestPalindrome(String s) {
+        if (s == null || s.length() == 0) return "";
+        if (s.length() == 1) return s;
+        for (int i = 0; i < s.length() - 1; i++) {
+            maxString(s, i, i);
+            maxString(s, i, i+1);
+        }
+        return s.substring(start, end+1);
+    }
+
+    private void maxString(String s, int l, int r) {
+        while (l >= 0 && r < s.length() && s.charAt(l) == s.charAt(r)){
+            l--;
+            r++;
+        }
+        int len = r - l + 1;
+        if (len > maxLen){
+            start = l+1;
+            end = r-1;
+            maxLen = len;
+        }
     }
 }
