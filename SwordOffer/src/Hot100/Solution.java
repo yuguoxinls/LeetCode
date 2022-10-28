@@ -686,4 +686,29 @@ public class Solution {
             maxLen = len;
         }
     }
+
+    /**
+     * 给定一个长度为 n 的整数数组 height 。有 n 条垂线，第 i 条线的两个端点是 (i, 0) 和 (i, height[i]) 。
+     * 找出其中的两条线，使得它们与 x 轴共同构成的容器可以容纳最多的水。
+     * 返回容器可以储存的最大水量。
+     */
+    public int maxArea(int[] height) {
+        /*int max = Integer.MIN_VALUE;
+        int curArea;
+        for (int i = 0; i < height.length - 1; i++) {
+            for (int j = i + 1; j < height.length; j++) {
+                curArea = (j - i) * (Math.min(height[i], height[j]));
+                max = Math.max(curArea, max);
+            }
+        }
+        return max;*/ // 能过，但超时了
+        // TODO: 2022/10/28 K神，双指针，每次都移动短板
+        // 移动长板，移动后水槽的面积不变或变小，一定不会变大；移动短板有可能会变大，因此移动短板
+        int res = 0;
+        int i = 0, j = height.length - 1;
+        while (i < j){
+            res = height[i] < height[j] ? Math.max(res, (j - i) * height[i++]) : Math.max(res, (j - i) * height[j--]);
+        }
+        return res;
+    }
 }
