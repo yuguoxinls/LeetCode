@@ -261,4 +261,133 @@ class Solution {
         }
         return n == 0;
     }
+
+    /**
+     * 8. 判断子序列
+     * 给定字符串 s 和 t ，判断 s 是否为 t 的子序列。
+     * 字符串的一个子序列是原始字符串删除一些（也可以不删除）字符而不改变剩余字符相对位置形成的新字符串。（例如，"ace"是"abcde"的一个子序列，而"aec"不是）。
+     * 进阶：
+     * 如果有大量输入的 S，称作 S1, S2, ... , Sk 其中 k >= 10亿，你需要依次检查它们是否为 T 的子序列。在这种情况下，你会怎样改变代码？
+     * 示例 1：
+     * 输入：s = "abc", t = "ahbgdc"
+     * 输出：true
+     * 示例 2：
+     * 输入：s = "axc", t = "ahbgdc"
+     * 输出：false
+     */
+    public boolean isSubsequence(String s, String t) {
+        /*if (s.equals(t)) return true;
+        if (s.length() > t.length()) return false;
+        int i = 0, j = 0;
+        while (i < s.length()){
+            while (j < t.length() && s.charAt(i) != t.charAt(j)) j++;
+            if (j == t.length()) return false;
+            else {
+                i++;
+                j++;
+            }
+        }
+        return true;*/
+        int index = -1; // TODO: 2022/11/4 快一点
+        for (char c : s.toCharArray()) {
+            index = t.indexOf(c, index + 1); // 返回从 fromIndex 位置开始查找指定字符在字符串中第一次出现处的索引，如果此字符串中没有这样的字符，则返回 -1
+            if (index == -1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 9. 非递减数列
+     * 给你一个长度为 n 的整数数组 nums ，请你判断在 最多 改变 1 个元素的情况下，该数组能否变成一个非递减数列。
+     * 我们是这样定义一个非递减数列的： 对于数组中任意的 i (0 <= i <= n-2)，总满足 nums[i] <= nums[i + 1]。
+     * 示例 1:
+     * 输入: nums = [4,2,3]
+     * 输出: true
+     * 解释: 你可以通过把第一个 4 变成 1 来使得它成为一个非递减数列。
+     * 示例 2:
+     * 输入: nums = [4,2,1]
+     * 输出: false
+     * 解释: 你不能在只改变一个元素的情况下将其变为非递减数列。
+     */
+    public boolean checkPossibility(int[] nums) { // TODO: 2022/11/4
+        int cnt = 0;
+        for (int i = 1; i < nums.length && cnt < 2; i++) {
+            if (nums[i] >= nums[i - 1]) { // 正常非递减，跳过
+                continue;
+            }
+            cnt++; // 执行到这里，说明 nums[i] < nums[i - 1]
+            /**
+             * 在出现nums[i]<nums[i-1]时，需要考虑的是应该修改数组的哪个数，使得本次修改能使i之前的数组成为非递减数组，并且不影响后续的操作 。
+             * 优先考虑令 nums[i - 1] = nums[i]，因为如果修改 nums[i] = nums[i - 1] 的话，那么 nums[i] 这个数会变大，就有可能比 nums[i + 1] 大，从而影响了后续操作。
+             * 还有一个比较特别的情况就是 nums[i] < nums[i - 2]，修改 nums[i - 1] = nums[i] 不能使数组成为非递减数组，只能修改 nums[i] = nums[i - 1]
+             */
+            if (i - 2 >= 0 && nums[i - 2] > nums[i]) {
+                nums[i] = nums[i - 1];
+            } else {
+                nums[i - 1] = nums[i];
+            }
+        }
+        return cnt <= 1;
+    }
+
+    /**
+     * 10. 最大子数组和
+     * 给你一个整数数组 nums ，请你找出一个具有最大和的连续子数组（子数组最少包含一个元素），返回其最大和。
+     * 子数组 是数组中的一个连续部分
+     * 示例 1：
+     * 输入：nums = [-2,1,-3,4,-1,2,1,-5,4]
+     * 输出：6
+     * 解释：连续子数组 [4,-1,2,1] 的和最大，为 6 。
+     * 示例 2：
+     * 输入：nums = [1]
+     * 输出：1
+     * 示例 3：
+     * 输入：nums = [5,4,-1,7,8]
+     * 输出：23
+     */
+    public int maxSubArray(int[] nums) { // TODO: 2022/11/4
+        if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        int curSum = nums[0];
+        int maxSum = nums[0];
+        for (int i = 1; i < nums.length; i++) {
+            curSum = curSum > 0 ? curSum + nums[i] : nums[i]; // 判断当前的数之和是否大于零，如果小于零，把他加上也是做负贡献
+            maxSum = Math.max(maxSum, curSum);
+        }
+        return maxSum;
+    }
+
+    /**
+     * 11. 划分字母区间
+     * 字符串 S 由小写字母组成。我们要把这个字符串划分为尽可能多的片段，同一字母最多出现在一个片段中。返回一个表示每个字符串片段的长度的列表。
+     * 示例：
+     * 输入：S = "ababcbacadefegdehijhklij"
+     * 输出：[9,7,8]
+     * 解释：
+     * 划分结果为 "ababcbaca", "defegde", "hijhklij"。
+     * 每个字母最多出现在一个片段中。
+     * 像 "ababcbacadefegde", "hijhklij" 的划分是错误的，因为划分的片段数较少。
+     */
+    public List<Integer> partitionLabels(String s) { // TODO: 2022/11/4
+        int[] last = new int[26];
+        int length = s.length();
+        for (int i = 0; i < length; i++) { // 存放字符串中每个字符出现的最远位置下标，按照字母表顺序
+            last[s.charAt(i) - 'a'] = i;
+        }
+        List<Integer> partition = new ArrayList<>();
+        int start = 0; // 待切割的起始位置
+        int end = 0; // 已扫描的字符中最远的位置
+        for (int i = 0; i < length; i++) {
+            int curIndex = last[s.charAt(i) - 'a']; // 当前扫描的字符的最远位置
+            end = Math.max(end, curIndex); // 更新「已扫描的字符中最远的位置」
+            if (i == end) { // 正好扫描到「已扫描的字符的最远位置」，到达切割点
+                partition.add(end - start + 1);
+                start = end + 1;
+            }
+        }
+        return partition;
+    }
 }

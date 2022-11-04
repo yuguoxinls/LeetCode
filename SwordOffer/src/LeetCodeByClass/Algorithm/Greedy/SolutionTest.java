@@ -29,4 +29,28 @@ public class SolutionTest {
         int[] p = {0,0,0,0,0,1,0,0};
         System.out.println(solution.canPlaceFlowers(p, 1));
     }
+
+    @Test
+    public void isSubsequence() {
+        String s = "axc", t = "ahbgdc";
+        System.out.println(solution.isSubsequence(s, t));
+    }
+
+    @Test
+    public void checkPossibility() {
+        int[] nums = {4,2,3};
+        System.out.println(solution.checkPossibility(nums));
+    }
+
+    @Test
+    public void maxSubArray() {
+        int[] nums = {5,4,-1,7,8};
+        System.out.println(solution.maxSubArray(nums));
+    }
+
+    @Test
+    public void partitionLabels() {
+        String S = "jababcbacadefegdehijhklij";
+        System.out.println(solution.partitionLabels(S));
+    }
 }
