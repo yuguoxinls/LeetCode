@@ -30,7 +30,7 @@ public class Solution {
         while (l < r) {
             if (numbers[l] + numbers[r] < target) l++;
             else if (numbers[l] + numbers[r] > target) r--;
-            else return new int[]{l + 1, r + 1}; // TODO: 2022/10/31 看清题目，下标从 1 开始，真tm坏
+            else return new int[]{l + 1, r + 1};
         }
         return new int[]{-1, -1};
     }
@@ -47,7 +47,7 @@ public class Solution {
      * 输出：false
      */
     public boolean judgeSquareSum(int c) {
-        long l = 0, r = (long) Math.sqrt(c); // TODO: 2022/10/31 不能使用int 会报错，注意r的初始值
+        long l = 0, r = (long) Math.sqrt(c); // TODO: 2022/10/31 不能使用int 会报错
         while (l <= r) {
             long sum = l * l + r * r;
             if (sum > c) r--;
@@ -109,12 +109,12 @@ public class Solution {
                 l++;
                 r--;
             }else {
-                return validPalindrome(str, l, r-1) || validPalindrome(str, l+1, r);
+                return validPalindrome(str, l, r-1) || validPalindrome(str, l+1, r); // 当两端字符不等时，删除其中一个，判断剩下的串是否为回文串
             }
         }
         return true;
     }
-    private boolean validPalindrome(StringBuilder str, int l, int r) {
+    private boolean validPalindrome(StringBuilder str, int l, int r) { // 单纯的判断一个字符串是否是回文串
         while (l <= r){
             if (str.charAt(l) != str.charAt(r)) return false;
             else {
@@ -150,7 +150,7 @@ public class Solution {
      */
     public void merge(int[] nums1, int m, int[] nums2, int n) {
         // 方法一：双指针
-        /*int[] newNum1 = Arrays.copyOfRange(nums1, 0, m);
+        int[] newNum1 = Arrays.copyOfRange(nums1, 0, m);
         int i = 0, j = 0, index = 0;
         while (i < newNum1.length && j < nums2.length){
             if (newNum1[i] <= nums2[j]){
@@ -163,9 +163,9 @@ public class Solution {
             while (j < nums2.length) nums1[index++] = nums2[j++];
         }else {
             while (i < newNum1.length) nums1[index++] = newNum1[i++];
-        }*/
+        }
         // 方法二：从后部插入, 还不如方法一快
-        int i = nums1.length;
+        /*int i = nums1.length;
         while (n > 0) {
             if (m > 0 && nums1[m - 1] > nums2[n - 1]) {
                 nums1[i - 1] = nums1[m - 1];
@@ -176,7 +176,7 @@ public class Solution {
                 i--;
                 n--;
             }
-        }
+        }*/
     }
 
     /**
