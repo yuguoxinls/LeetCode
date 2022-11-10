@@ -14,6 +14,9 @@ class Solution {
      * 在程序实现 BFS 时需要考虑以下问题：
      *  队列：用来存储每一轮遍历得到的节点；
      *  标记：对于遍历过的节点，应该将它标记，防止重复遍历。
+     * 在程序实现 DFS 时需要考虑以下问题：
+     *  栈：用栈来保存当前节点信息，当遍历新节点返回时能够继续遍历当前节点。可以使用递归栈。
+     *  标记：和 BFS 一样同样需要对已经遍历过的节点进行标记。
      */
 
     /**        BFS
@@ -277,4 +280,150 @@ class Solution {
 
         return numLands;
     }
+
+    /**
+     * 5. 课程表
+     * 你这个学期必须选修 numCourses 门课程，记为 0 到 numCourses - 1 。
+     * 在选修某些课程之前需要一些先修课程。 先修课程按数组 prerequisites 给出，其中 prerequisites[i] = [ai, bi] ，表示如果要学习课程 ai 则 必须 先学习课程  bi 。
+     * 例如，先修课程对 [0, 1] 表示：想要学习课程 0 ，你需要先完成课程 1 。
+     * 请你判断是否可能完成所有课程的学习？如果可以，返回 true ；否则，返回 false 。
+     * 示例 1：
+     * 输入：numCourses = 2, prerequisites = [[1,0]]
+     * 输出：true
+     * 解释：总共有 2 门课程。学习课程 1 之前，你需要完成课程 0 。这是可能的。
+     * 示例 2：
+     * 输入：numCourses = 2, prerequisites = [[1,0],[0,1]]
+     * 输出：false
+     * 解释：总共有 2 门课程。学习课程 1 之前，你需要先完成课程 0 ；并且学习课程 0 之前，你还应先完成课程 1 。这是不可能的。
+     */
+    public boolean canFinish(int numCourses, int[][] prerequisites) { // TODO: 2022/11/9 不会！！！
+        /**
+         * 分析本质可见，实际上就是判断有向图中是否有环
+         */
+        int[] indegrees = new int[numCourses];
+        List<List<Integer>> adjacency = new ArrayList<>();
+        Queue<Integer> queue = new LinkedList<>();
+        for(int i = 0; i < numCourses; i++)
+            adjacency.add(new ArrayList<>());
+        // Get the indegree and adjacency of every course.
+        for(int[] cp : prerequisites) {
+            indegrees[cp[0]]++;
+            adjacency.get(cp[1]).add(cp[0]);
+        }
+        // Get all the courses with the indegree of 0.
+        for(int i = 0; i < numCourses; i++)
+            if(indegrees[i] == 0) queue.add(i);
+        // BFS TopSort.
+        while(!queue.isEmpty()) {
+            int pre = queue.poll();
+            numCourses--;
+            for(int cur : adjacency.get(pre))
+                if(--indegrees[cur] == 0) queue.add(cur);
+        }
+        return numCourses == 0;
+    }
+
+    /**
+     * 从一个节点出发，使用 DFS 对一个图进行遍历时，能够遍历到的节点都是从初始节点可达的，DFS 常用来求解这种 可达性 问题。
+     * 在程序实现 DFS 时需要考虑以下问题：
+     *  栈：用栈来保存当前节点信息，当遍历新节点返回时能够继续遍历当前节点。可以使用递归栈。
+     *  标记：和 BFS 一样同样需要对已经遍历过的节点进行标记。
+     */
+
+    /**   DFS
+     * 1. 岛屿的最大面积
+     * 给你一个大小为 m x n 的二进制矩阵 grid 。
+     * 岛屿 是由一些相邻的 1 (代表土地) 构成的组合，这里的「相邻」要求两个 1 必须在 水平或者竖直的四个方向上 相邻。你可以假设 grid 的四个边缘都被 0（代表水）包围着。
+     * 岛屿的面积是岛上值为 1 的单元格的数目。
+     * 计算并返回 grid 中最大的岛屿面积。如果没有岛屿，则返回面积为 0 。
+     * 输入：grid = [[0,0,1,0,0,0,0,1,0,0,0,0,0],
+     *              [0,0,0,0,0,0,0,1,1,1,0,0,0],
+     *              [0,1,1,0,1,0,0,0,0,0,0,0,0],
+     *              [0,1,0,0,1,1,0,0,1,0,1,0,0],
+     *              [0,1,0,0,1,1,0,0,1,1,1,0,0],
+     *              [0,0,0,0,0,0,0,0,0,0,1,0,0],
+     *              [0,0,0,0,0,0,0,1,1,1,0,0,0],
+     *              [0,0,0,0,0,0,0,1,1,0,0,0,0]]
+     * 输出：6
+     * 解释：答案不应该是 11 ，因为岛屿只能包含水平或垂直这四个方向上的 1 。
+     * 示例 2：
+     * 输入：grid = [[0,0,0,0,0,0,0,0]]
+     * 输出：0
+     */
+    private int m, n;
+    private int[][] direction = {{0, 1}, {0, -1}, {1, 0}, {-1, 0}};
+    public int maxAreaOfIsland(int[][] grid) { // TODO: 2022/11/10
+        if (grid == null || grid.length == 0) {
+            return 0;
+        }
+        m = grid.length;
+        n = grid[0].length;
+        int maxArea = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                maxArea = Math.max(maxArea, dfs(grid, i, j));
+            }
+        }
+        return maxArea;
+    }
+    private int dfs(int[][] grid, int r, int c) {
+        if (r < 0 || r >= m || c < 0 || c >= n || grid[r][c] == 0) {
+            return 0;
+        }
+        grid[r][c] = 0; // 说明此时的grid[r][c]==1，标记为0表示已经访问过
+        int area = 1; // 定义初始的岛屿面积为1
+        for (int[] d : direction) {
+            area += dfs(grid, r + d[0], c + d[1]); // 其实就是递归遍历上下左右4个方向，和BFS的 4. 岛屿数量是相同的，只不过4是分开写的
+        }
+        return area;
+    }
+
+    /**
+     * 2. 同 BFS 4. 岛屿数量，只不过是DFS解法
+     */
+    /*public int numIslandsV2(char[][] grid) {
+        if (grid == null || grid.length == 0) {
+            return 0;
+        }
+        m = grid.length;
+        n = grid[0].length;
+        int numLands = 0;
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                dfs(grid, i, j);
+                numLands++;
+            }
+        }
+        return numLands;
+    }
+    private void dfs(char[][] grid, int i, int j) {
+        if (i < 0 || i >= m || j < 0 || j >= n || grid[i][j] == '0') {
+            return;
+        }
+        grid[i][j] = '0';
+        for (int[] d : direction) {
+            dfs(grid, i + d[0], j + d[1]);
+        }
+    }*/ // 自己测试没有问题，力扣提交会报错，不知道为什么
+    public int numIslandsV2(char[][] grid) {
+        int count = 0;
+        for(int i = 0; i < grid.length; i++) {
+            for(int j = 0; j < grid[0].length; j++) {
+                if(grid[i][j] == '1'){
+                    dfs(grid, i, j);
+                    count++;
+                }
+            }
+        }
+        return count;
+    }
+    private void dfs(char[][] grid, int i, int j){
+        if(i < 0 || j < 0 || i >= grid.length || j >= grid[0].length || grid[i][j] == '0') return;
+        grid[i][j] = '0';
+        dfs(grid, i + 1, j);
+        dfs(grid, i, j + 1);
+        dfs(grid, i - 1, j);
+        dfs(grid, i, j - 1);
+    }
+
 }

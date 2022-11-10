@@ -18,7 +18,13 @@ public class SolutionTest {
 
     @Test
     public void numIslands() {
-        char[][] grid = {{'1','1','0','0','0'},{'1','1','0','0','0'},{'0','0','1','0','0'},{'0','0','0','1','1'}};
+        char[][] grid = {{'1','1','1','1','0'},{'1','1','0','1','0'},{'1','1','0','0','0'},{'0','0','0','0','0'}};
+        System.out.println(solution.numIslands(grid));
+    }
+
+    @Test
+    public void numIslandsV2() {
+        char[][] grid = {{'1','1','1','1','0'},{'1','1','0','1','0'},{'1','1','0','0','0'},{'0','0','0','0','0'}};
         System.out.println(solution.numIslands(grid));
     }
 }
