@@ -33,4 +33,16 @@ public class SolutionTest {
         int[][] grid = {{1,0,0},{0,1,0},{0,0,1}};
         System.out.println(solution.findCircleNum(grid));
     }
+
+    @Test
+    public void letterCombinations() {
+        String s = "356";
+        System.out.println(solution.letterCombinations(s));
+    }
+
+    @Test
+    public void restoreIpAddresses() {
+        String s = "25525511135";
+        System.out.println(solution.restoreIpAddresses(s));
+    }
 }

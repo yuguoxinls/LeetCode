@@ -470,5 +470,224 @@ class Solution {
         }
     }
 
+    /**
+     * 4. 被围绕的区域
+     * 给你一个 m x n 的矩阵 board ，由若干字符 'X' 和 'O' ，找到所有被 'X' 围绕的区域，并将这些区域里所有的 'O' 用 'X' 填充。
+     * 示例 1：
+     * 输入：board = [["X","X","X","X"],["X","O","O","X"],["X","X","O","X"],["X","O","X","X"]]
+     * 输出：[["X","X","X","X"],["X","X","X","X"],["X","X","X","X"],["X","O","X","X"]]
+     * 解释：被围绕的区间不会存在于边界上，换句话说，任何边界上的 'O' 都不会被填充为 'X'。
+     * 任何不在边界上，或不与边界上的 'O' 相连的 'O' 最终都会被填充为 'X'。如果两个元素在水平或垂直方向相邻，则称它们是“相连”的。
+     * 示例 2：
+     * 输入：board = [["X"]]
+     * 输出：[["X"]]
+     */
+    public void solve(char[][] board) {
+        int row = board.length;
+        int col = board[0].length;
+        for (int i = 0; i < row; i++) { // 以最左列和最右列的O字符为起点，深度优先遍历，把和这两个边界相连的O都找到，并修改为A
+            dfsV3(board, i, 0);
+            dfsV3(board, i, col-1);
+        }
+        for (int i = 1; i < col; i++) { // 以最左上列和最下列的O字符为起点，深度优先遍历，把和这两个边界相连的O都找到，并修改为A
+            dfsV3(board, 0, i);
+            dfsV3(board, row-1, i);
+        }
+        // 这两个循环后，凡是和边界上的O相连的O，已经都变成了A，这样后面就不会错误修改了，题目中要求和边界O相连的O，不要修改为X
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (board[i][j] == 'O'){
+                    board[i][j] = 'X';
+                }else if (board[i][j] == 'A'){
+                    board[i][j] = 'O';
+                }
+            }
+        }
+    }
+    private void dfsV3(char[][] board, int i, int j) { // dfs 如果遍历到O，就改为A
+        int row = board.length;
+        int col = board[0].length;
+        if (i >= row || i < 0 || j >= col || j < 0 || board[i][j] != 'O') return;
+        board[i][j] = 'A';
+        dfsV3(board, i, j+1);
+        dfsV3(board, i, j-1);
+        dfsV3(board, i+1, j);
+        dfsV3(board, i-1, j);
+    }
+
+    /**
+     * 5. 太平洋大西洋水流问题
+     * 有一个 m × n 的矩形岛屿，与 太平洋 和 大西洋 相邻。 “太平洋” 处于大陆的左边界和上边界，而 “大西洋” 处于大陆的右边界和下边界。
+     * 这个岛被分割成一个由若干方形单元格组成的网格。给定一个 m x n 的整数矩阵 heights ， heights[r][c] 表示坐标 (r, c) 上单元格 高于海平面的高度 。
+     * 岛上雨水较多，如果相邻单元格的高度 小于或等于 当前单元格的高度，雨水可以直接向北、南、东、西流向相邻单元格。水可以从海洋附近的任何单元格流入海洋。
+     * 返回网格坐标 result 的 2D 列表 ，其中 result[i] = [ri, ci] 表示雨水从单元格 (ri, ci) 流动 既可流向太平洋也可流向大西洋 。
+     * 示例 1：
+     * 输入: heights = [[1,2,2,3,5],[3,2,3,4,4],[2,4,5,3,1],[6,7,1,4,5],[5,1,1,2,4]]
+     * 输出: [[0,4],[1,3],[1,4],[2,2],[3,0],[3,1],[4,0]]
+     * 示例 2：
+     * 输入: heights = [[2,1],[1,2]]
+     * 输出: [[0,0],[0,1],[1,0],[1,1]]
+     */
+    static int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};
+    int[][] heights;
+//    int m, n;
+
+    public List<List<Integer>> pacificAtlantic(int[][] heights) {
+        this.heights = heights;
+        this.m = heights.length;
+        this.n = heights[0].length;
+        boolean[][] pacific = new boolean[m][n];
+        boolean[][] atlantic = new boolean[m][n];
+        // 分别以四个边界为起点，进行dfs
+        for (int i = 0; i < m; i++) { // 以最左列的每个元素为起点，进行dfs
+            dfs(i, 0, pacific);
+        }
+        for (int j = 1; j < n; j++) { // 以最上列的每个元素为起点，进行dfs
+            dfs(0, j, pacific);
+        }
+        for (int i = 0; i < m; i++) { // 以最右列的每个元素为起点，进行dfs
+            dfs(i, n - 1, atlantic);
+        }
+        for (int j = 0; j < n - 1; j++) { // 以最下列的每个元素为起点，进行dfs
+            dfs(m - 1, j, atlantic);
+        }
+        List<List<Integer>> result = new ArrayList<>();
+        for (int i = 0; i < m; i++) {
+            for (int j = 0; j < n; j++) {
+                if (pacific[i][j] && atlantic[i][j]) { // 题目要求，既可流向太平洋也可流向大西洋，因此用的是 &&
+                    List<Integer> cell = new ArrayList<>();
+                    cell.add(i);
+                    cell.add(j);
+                    result.add(cell);
+                }
+            }
+        }
+        return result;
+    }
+    public void dfs(int row, int col, boolean[][] ocean) {
+        if (ocean[row][col]) { // 已经访问过的话，直接返回
+            return;
+        }
+        ocean[row][col] = true; // 标记为已访问过
+        for (int[] dir : dirs) { // 向4个方向走
+            int newRow = row + dir[0], newCol = col + dir[1]; // 走完之后的坐标
+            if (newRow >= 0 && newRow < m && newCol >= 0 && newCol < n && heights[newRow][newCol] >= heights[row][col]) { // 如果高度更高的话，才会继续往下走
+                dfs(newRow, newCol, ocean);
+            }
+        }
+    }
+
+    /**
+     * 回溯问题 Backtracking
+     * Backtracking（回溯）属于 DFS。
+     *  普通 DFS 主要用在 可达性问题 ，这种问题只需要执行到特点的位置然后返回即可。
+     *  而 Backtracking 主要用于求解 排列组合 问题，例如有 { 'a','b','c' } 三个字符，求解所有由这三个字符排列得到的字符串，这种问题在执行到特定的位置返回之后还会继续执行求解过程。
+     * 因为 Backtracking 不是立即返回，而要继续求解，因此在程序实现时，需要注意对元素的标记问题：
+     *  在访问一个新元素进入新的递归调用时，需要将新元素标记为已经访问，这样才能在继续递归调用时不用重复访问该元素；
+     *  但是在递归返回时，需要将元素标记为未访问，因为只需要保证在一个递归链中不同时访问一个元素，可以访问 已经访问过但是不在当前递归链中 的元素。
+     */
+
+    /**
+     * 1. 电话号码的字母组合
+     * 给定一个仅包含数字 2-9 的字符串，返回所有它能表示的字母组合。答案可以按 任意顺序 返回。
+     * 给出数字到字母的映射如下（9键）。注意 1 不对应任何字母。
+     * 示例 1：
+     * 输入：digits = "23"   2->abc   3->def
+     * 输出：["ad","ae","af","bd","be","bf","cd","ce","cf"]
+     * 示例 2：
+     * 输入：digits = ""
+     * 输出：[]
+     * 示例 3：
+     * 输入：digits = "2"
+     * 输出：["a","b","c"]
+     */
+    private static final String[] KEYS = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
+    public List<String> letterCombinations(String digits) {
+        List<String> combinations = new ArrayList<>();
+        if (digits == null || digits.length() == 0) {
+            return combinations;
+        }
+        doCombination(new StringBuilder(), combinations, digits);
+        return combinations;
+    }
+    private void doCombination(StringBuilder prefix, List<String> combinations, final String digits) {
+        if (prefix.length() == digits.length()) { // 这一句的意思是代表完成了一次组合，比如说digits=“345”，那么字母组合的长度应该和digits的长度是一样的，可能是“dhk”
+            combinations.add(prefix.toString());
+            return;
+        }
+        int curDigits = digits.charAt(prefix.length()) - '0'; // 得到当前的数字，注意，把字符串转成了数字
+        String letters = KEYS[curDigits]; // 得到当前数字对应的字母是哪几个
+        for (char c : letters.toCharArray()) {
+            prefix.append(c);                         // 添加
+            doCombination(prefix, combinations, digits);
+            prefix.deleteCharAt(prefix.length() - 1); // 执行到这里，说明完成了一次组合，但是要注意的是，完成之后要删除一个，来进行下一次的组合
+        }
+    }
+
+    /**
+     * 2. 复原 IP 地址
+     * 有效 IP 地址 正好由四个整数（每个整数位于 0 到 255 之间组成，且不能含有前导 0），整数之间用 '.' 分隔。
+     * 例如："0.1.2.201" 和 "192.168.1.1" 是 有效 IP 地址，但是 "0.011.255.245"、"192.168.1.312" 和 "192.168@1.1" 是 无效 IP 地址。
+     * 给定一个只包含数字的字符串 s ，用以表示一个 IP 地址，返回所有可能的有效 IP 地址，这些地址可以通过在 s 中插入 '.' 来形成。你 不能 重新排序或删除 s 中的任何数字。你可以按 任何 顺序返回答案。
+     * 示例 1：
+     * 输入：s = "25525511135"
+     * 输出：["255.255.11.135","255.255.111.35"]
+     * 示例 2：
+     * 输入：s = "0000"
+     * 输出：["0.0.0.0"]
+     * 示例 3：
+     * 输入：s = "101023"
+     * 输出：["1.0.10.23","1.0.102.3","10.1.0.23","10.10.2.3","101.0.2.3"]
+     */
+    static final int SEG_COUNT = 4;
+    List<String> ans = new ArrayList<>();
+    int[] segments = new int[SEG_COUNT];
+
+    public List<String> restoreIpAddresses(String s) { // TODO: 2022/11/11 是真看不懂啊。。。
+        segments = new int[SEG_COUNT];
+        dfs(s, 0, 0);
+        return ans;
+    }
+
+    public void dfs(String s, int segId, int segStart) {
+        // 如果找到了 4 段 IP 地址并且遍历完了字符串，那么就是一种答案
+        if (segId == SEG_COUNT) {
+            if (segStart == s.length()) {
+                StringBuffer ipAddr = new StringBuffer();
+                for (int i = 0; i < SEG_COUNT; ++i) {
+                    ipAddr.append(segments[i]);
+                    if (i != SEG_COUNT - 1) {
+                        ipAddr.append('.');
+                    }
+                }
+                ans.add(ipAddr.toString());
+            }
+            return;
+        }
+
+        // 如果还没有找到 4 段 IP 地址就已经遍历完了字符串，那么提前回溯
+        if (segStart == s.length()) {
+            return;
+        }
+
+        // 由于不能有前导零，如果当前数字为 0，那么这一段 IP 地址只能为 0
+        if (s.charAt(segStart) == '0') {
+            segments[segId] = 0;
+            dfs(s, segId + 1, segStart + 1);
+        }
+
+        // 一般情况，枚举每一种可能性并递归
+        int addr = 0;
+        for (int segEnd = segStart; segEnd < s.length(); ++segEnd) {
+            addr = addr * 10 + (s.charAt(segEnd) - '0');
+            if (addr > 0 && addr <= 0xFF) {
+                segments[segId] = addr;
+                dfs(s, segId + 1, segEnd + 1);
+            } else {
+                break;
+            }
+        }
+    }
+
 
 }
