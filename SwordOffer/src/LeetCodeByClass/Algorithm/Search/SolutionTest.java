@@ -45,4 +45,17 @@ public class SolutionTest {
         String s = "25525511135";
         System.out.println(solution.restoreIpAddresses(s));
     }
+
+    @Test
+    public void exist() {
+        char[][] board = {{'A','B','C','E'},{'S','F','C','S'},{'A','D','E','E'}};
+        String word = "ABCCED";
+        System.out.println(solution.exist(board, word));
+    }
+
+    @Test
+    public void permute() {
+        int[] nums = {1,2,3};
+        System.out.println(solution.permute(nums));
+    }
 }

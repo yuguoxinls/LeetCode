@@ -602,7 +602,7 @@ class Solution {
      * 输出：["a","b","c"]
      */
     private static final String[] KEYS = {"", "", "abc", "def", "ghi", "jkl", "mno", "pqrs", "tuv", "wxyz"};
-    public List<String> letterCombinations(String digits) {
+    public List<String> letterCombinations(String digits) { // TODO: 2022/11/11
         List<String> combinations = new ArrayList<>();
         if (digits == null || digits.length() == 0) {
             return combinations;
@@ -687,6 +687,130 @@ class Solution {
                 break;
             }
         }
+    }
+
+    /**
+     * 3. 单词搜索
+     * 给定一个 m x n 二维字符网格 board 和一个字符串单词 word 。如果 word 存在于网格中，返回 true ；否则，返回 false 。
+     * 单词必须按照字母顺序，通过相邻的单元格内的字母构成，其中“相邻”单元格是那些水平相邻或垂直相邻的单元格。同一个单元格内的字母不允许被重复使用。
+     * 示例 1：
+     * 输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "ABCCED"
+     * 输出：true
+     * 示例 2：
+     * 输入：board = [["A","B","C","E"],["S","F","C","S"],["A","D","E","E"]], word = "SEE"
+     * 输出：true
+     */
+    int[][] direc = {{-1,0},{1,0},{0,-1},{0,1}};
+    public boolean exist(char[][] board, String word) { // TODO: 2022/11/14
+        if (word == null || word.length() == 0) {
+            return true;
+        }
+        if (board == null || board.length == 0 || board[0].length == 0) {
+            return false;
+        }
+        int row = board.length, col = board[0].length;
+        boolean[][] visited = new boolean[row][col]; // 不单单是用来标记是否访问过，更重要的是能用做回溯
+
+        for (int i = 0; i <row; i++) {
+            for (int j = 0; j < col; j++) {
+                if (Backtracking(0, visited, board, i, j, word)) return true;
+            }
+        }
+        return false;
+    }
+    private boolean Backtracking(int curLen, boolean[][] visited, char[][] board, int i, int j, String word) {
+        if (curLen == word.length()) return true; // 如果已经比对到了最后一个字符，那么说明网格中存在该单词
+        int row = board.length, col = board[0].length;
+        if (i < 0 || i >= row || j < 0 || j >= col || visited[i][j] || word.charAt(curLen) != board[i][j]) return false; // 索引越界或已经访问过并能走通或当前字符和单词中的字符不相等
+        visited[i][j] = true; // 说明网格中的当前字符和单词中的当前字符相等，将其标记为已访问过
+        for (int[] d : direc) {
+            if (Backtracking(curLen+1, visited, board, i + d[0], j+d[1], word)) return true; // 向上下左右四个方向回溯
+        }
+        visited[i][j] = false; // 能运行到这，说明在前面的向上下左右的四个方向，都找不到符合要求的字符，说明当前这个字符是死路，将其重新标记为false，这也是回溯不同于dfs的地方
+        return false;
+    }
+
+    /**
+     * 4. 二叉树的所有路径
+     * 给你一个二叉树的根节点 root ，按 任意顺序 ，返回所有从根节点到叶子节点的路径。
+     * 叶子节点 是指没有子节点的节点。
+     * 示例 1：
+     * 输入：root = [1,2,3,null,5]
+     * 输出：["1->2->5","1->3"]
+     * 示例 2：
+     * 输入：root = [1]
+     * 输出：["1"]
+     */
+    public List<String> binaryTreePaths(TreeNode root) { // TODO: 2022/11/14
+        List<String> ans = new ArrayList<>();
+        if (root == null) return ans;
+        List<Integer> values = new ArrayList<>();
+        Backtracking(root, ans, values);
+        return ans;
+    }
+
+    private void Backtracking(TreeNode node, List<String> ans, List<Integer> values) {
+        if (node == null) return;
+        values.add(node.val); // 把当前节点的值放到values中
+        if (isLeaf(node)) { // 如果当前节点是叶子节点，说明此条路已经走到底了，将其拼接好放到ans中
+            ans.add(buildPath(values));
+        }else { // 不是叶子节点，就向当前节点的两侧递归
+            Backtracking(node.left, ans, values);
+            Backtracking(node.right, ans, values);
+        }
+        values.remove(values.size()-1); // !!!!!!! 非常重要，体现了回溯，在遍历到叶子节点并把其添加到路径后，要删除其值，下一次拼接的时候，从上一个节点开始
+    }
+
+    private String buildPath(List<Integer> values) {
+        StringBuilder str = new StringBuilder();
+        for (int i = 0; i < values.size(); i++) {
+            str.append(values.get(i));
+            if (i != values.size() - 1) str.append("->");
+        }
+        return str.toString();
+    }
+
+    private boolean isLeaf(TreeNode node) {
+        return node != null && node.left == null && node.right == null;
+    }
+
+    /**
+     * 5. 全排列
+     * 给定一个不含重复数字的数组 nums ，返回其 所有可能的全排列 。你可以 按任意顺序 返回答案。
+     * 示例 1：
+     * 输入：nums = [1,2,3]
+     * 输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+     * 示例 2：
+     * 输入：nums = [0,1]
+     * 输出：[[0,1],[1,0]]
+     * 示例 3：
+     * 输入：nums = [1]
+     * 输出：[[1]]
+     */
+    public List<List<Integer>> permute(int[] nums) { // TODO: 2022/11/14
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> subAns = new ArrayList<>();
+        boolean[] visited = new boolean[nums.length];
+        backTracking(ans, subAns, visited, nums);
+        return ans;
+    }
+
+    private void backTracking(List<List<Integer>> ans, List<Integer> subAns, boolean[] visited, int[] nums) {
+        if (subAns.size() == nums.length) { // 终止条件
+//            ans.add(subAns);
+            ans.add(new ArrayList<>(subAns)); // 一定要这样，新建一个List，不能像上面那样，如果像上面那样，下面对subAns的修改会影响到ans中之前保存的值
+            return;
+        }
+
+        for (int i = 0; i < visited.length; i++) {
+            if (visited[i]) continue;
+            visited[i] = true;
+            subAns.add(nums[i]);
+            backTracking(ans, subAns, visited, nums);
+            subAns.remove(subAns.size()-1); // 回溯时要删除最后一个元素，并将其修改为未被访问过
+            visited[i] = false;
+        }
+
     }
 
 
