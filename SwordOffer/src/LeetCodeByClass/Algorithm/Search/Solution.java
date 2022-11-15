@@ -888,7 +888,7 @@ class Solution {
             ans.add(new ArrayList<>(subAns));
             return;
         }
-        for (int i = start; i <= n - k + 1; i++) {  // 剪枝 // TODO: 2022/11/15 剪枝什么意思
+        for (int i = start; i <= n - k + 1; i++) {  // 剪枝 // TODO: 2022/11/15 个人理解，n-k+1 -> n-(k-1), 要求k个数的组合，总共有n个数可选，那么每次固定k-1个数，只有1个数是可变的
             subAns.add(i);
             backTrackingV3(ans, subAns, i + 1, k - 1, n);
             subAns.remove(subAns.size() - 1);
