@@ -58,4 +58,32 @@ public class SolutionTest {
         int[] nums = {1,2,3};
         System.out.println(solution.permute(nums));
     }
+
+    @Test
+    public void permuteUnique() {
+        int[] nums = {1,1,3};
+        System.out.println(solution.permuteUnique(nums));
+    }
+
+    @Test
+    public void combine() {
+        System.out.println(solution.combine(4, 3));
+    }
+
+    @Test
+    public void combinationSum() {
+        int[] nums = {7,6,2,3};
+        System.out.println(solution.combinationSum(nums, 7));
+    }
+
+    @Test
+    public void combinationSum2() {
+        int[] nums = {10,1,2,7,6,1,5};
+        System.out.println(solution.combinationSum2(nums, 8));
+    }
+
+    @Test
+    public void combinationSum3() {
+        System.out.println(solution.combinationSum3(4, 1));
+    }
 }

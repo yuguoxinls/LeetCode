@@ -3,10 +3,7 @@ package LeetCodeByClass.Algorithm.Search;
 
 import org.testng.internal.collections.Pair;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Queue;
+import java.util.*;
 
 class Solution {
     /**
@@ -794,7 +791,6 @@ class Solution {
         backTracking(ans, subAns, visited, nums);
         return ans;
     }
-
     private void backTracking(List<List<Integer>> ans, List<Integer> subAns, boolean[] visited, int[] nums) {
         if (subAns.size() == nums.length) { // 终止条件
 //            ans.add(subAns);
@@ -810,7 +806,251 @@ class Solution {
             subAns.remove(subAns.size()-1); // 回溯时要删除最后一个元素，并将其修改为未被访问过
             visited[i] = false;
         }
+    }
 
+    /**
+     * 6. 全排列 II
+     * 给定一个可包含重复数字的序列 nums ，按任意顺序 返回所有不重复的全排列。
+     * 示例 1：
+     * 输入：nums = [1,1,2]
+     * 输出：
+     * [[1,1,2],
+     *  [1,2,1],
+     *  [2,1,1]]
+     * 示例 2：
+     * 输入：nums = [1,2,3]
+     * 输出：[[1,2,3],[1,3,2],[2,1,3],[2,3,1],[3,1,2],[3,2,1]]
+     */
+    public List<List<Integer>> permuteUnique(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> subAns = new ArrayList<>();
+        Arrays.sort(nums); // TODO: 2022/11/15 对数组先排序，这样相同元素就挨在一起了，在后面排列的时候，判断该元素是否和之前的元素相同，如果相同且之前的元素还未被访问过，就跳过该元素
+        boolean[] visited = new boolean[nums.length];
+        backTrackingV2(ans, subAns, visited, nums);
+        return ans;
+    }
+    private void backTrackingV2(List<List<Integer>> ans, List<Integer> subAns, boolean[] visited, int[] nums) { 
+        if (subAns.size() == nums.length){
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        for (int i = 0; i < visited.length; i++) {
+            
+            if (i > 0 && nums[i] == nums[i-1] && !visited[i-1]) continue;
+            
+            if (visited[i]) continue;
+            visited[i] = true;
+            subAns.add(nums[i]);
+            backTrackingV2(ans, subAns, visited, nums);
+            subAns.remove(subAns.size() - 1);
+            visited[i] = false;
+        }
+    }
+
+    /**
+     * 7. 组合
+     * 给定两个整数 n 和 k，返回范围 [1, n] 中所有可能的 k 个数的组合。
+     * 你可以按 任何顺序 返回答案。
+     * 示例 1：
+     * 输入：n = 4, k = 2
+     * 输出：
+     * [
+     *   [2,4],
+     *   [3,4],
+     *   [2,3],
+     *   [1,2],
+     *   [1,3],
+     *   [1,4],
+     * ]
+     * 示例 2：
+     * 输入：n = 1, k = 1
+     * 输出：[[1]]
+     */
+    public List<List<Integer>> combine(int n, int k) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> subAns = new ArrayList<>();
+//        boolean[] visited = new boolean[n+1];
+        backTrackingV3(ans, subAns,1, k, n);
+        return ans;
+    }
+
+    private void backTrackingV3(List<List<Integer>> ans, List<Integer> subAns, int start, int k, int n) {
+        /*if (subAns.size() == k){
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        for (int i = start; i <= n; i++) {
+            subAns.add(i);
+            backTrackingV3(ans, subAns,i + 1, k, n);
+            subAns.remove(subAns.size() - 1);
+        }*/ // 比较通用的回溯模板，但是有时比较慢
+        if (k == 0) {
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        for (int i = start; i <= n - k + 1; i++) {  // 剪枝 // TODO: 2022/11/15 剪枝什么意思
+            subAns.add(i);
+            backTrackingV3(ans, subAns, i + 1, k - 1, n);
+            subAns.remove(subAns.size() - 1);
+        }
+    }
+
+    /**
+     * 8. 组合总和
+     * 给你一个 无重复元素 的整数数组 candidates 和一个目标整数 target ，找出 candidates 中可以使数字和为目标数 target 的 所有 不同组合 ，并以列表形式返回。你可以按 任意顺序 返回这些组合。
+     * candidates 中的 同一个 数字可以 无限制重复被选取 。如果至少一个数字的被选数量不同，则两种组合是不同的。
+     * 对于给定的输入，保证和为 target 的不同组合数少于 150 个。
+     * 示例 1：
+     * 输入：candidates = [2,3,6,7], target = 7
+     * 输出：[[2,2,3],[7]]
+     * 解释：
+     * 2 和 3 可以形成一组候选，2 + 2 + 3 = 7 。注意 2 可以使用多次。
+     * 7 也是一个候选， 7 = 7 。
+     * 仅有这两种组合。
+     * 示例 2：
+     * 输入: candidates = [2,3,5], target = 8
+     * 输出: [[2,2,2,2],[2,3,3],[3,5]]
+     * 示例 3：
+     * 输入: candidates = [2], target = 1
+     * 输出: []
+     */
+    /*public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> subAns = new ArrayList<>();
+        backTrackingV4(ans, subAns, 0, candidates, target);
+        return ans;
+    }
+    private void backTrackingV4(List<List<Integer>> ans, List<Integer> subAns, int start, int[] candidates, int target) {
+        if (sum(subAns) == target){
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        if (sum(subAns) > target) return;
+        for (int i = start; i < candidates.length; i++) {
+            subAns.add(candidates[i]);
+            backTrackingV4(ans, subAns, i, candidates, target);
+            subAns.remove(subAns.size() - 1);
+        }
+    }
+    private int sum(List<Integer> subAns) {
+        int sum = 0;
+        for (Integer sub : subAns) {
+            sum += sub;
+        }
+        return sum;
+    }*/ // TODO: 2022/11/15 自己写的，能过，太慢
+    public List<List<Integer>> combinationSum(int[] candidates, int target) {
+        List<List<Integer>> ans = new ArrayList<>();
+        backtracking(new ArrayList<>(), ans, 0, target, candidates);
+        return ans;
+    }
+    private void backtracking(List<Integer> subAns, List<List<Integer>> ans, int start, int target, final int[] candidates) {
+        if (target == 0) {
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        for (int i = start; i < candidates.length; i++) {
+            if (candidates[i] <= target) {
+                subAns.add(candidates[i]);
+                backtracking(subAns, ans, i, target - candidates[i], candidates); // TODO: 2022/11/15 关键在于这，和上一题类似，好像也在做剪枝
+                subAns.remove(subAns.size() - 1);
+            }
+        }
+    }
+
+    /**
+     * 9. 组合总和 II
+     * 给定一个候选人编号的集合 candidates 和一个目标数 target ，找出 candidates 中所有可以使数字和为 target 的组合。
+     * candidates 中的每个数字在每个组合中只能使用 一次 。
+     * 注意：解集不能包含重复的组合。
+     * 示例 1:
+     * 输入: candidates = [10,1,2,7,6,1,5], target = 8,
+     * 输出:
+     * [
+     * [1,1,6],
+     * [1,2,5],
+     * [1,7],
+     * [2,6]
+     * ]
+     * 示例 2:
+     * 输入: candidates = [2,5,2,1,2], target = 5,
+     * 输出:
+     * [
+     * [1,2,2],
+     * [5]
+     * ]
+     */
+    public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> subAns = new ArrayList<>();
+        boolean[] visited = new boolean[candidates.length];
+        Arrays.sort(candidates);
+        backTrackingV5(ans, subAns, candidates, 0, target, visited);
+        return ans;
+    }
+
+    private void backTrackingV5(List<List<Integer>> ans, List<Integer> subAns, int[] candidates, int start, int target, boolean[] visited) {
+        if (target == 0){
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        for (int i = start; i < candidates.length; i++) {
+            if (i > 0 && candidates[i] == candidates[i-1] && !visited[i-1]) continue; // TODO: 2022/11/15 去除最后结果中的重复结果
+            if (candidates[i] <= target){
+                subAns.add(candidates[i]);
+                visited[i] = true;
+                backTrackingV5(ans, subAns, candidates, i+1, target - candidates[i], visited);
+                subAns.remove(subAns.size() - 1);
+                visited[i] = false;
+            }
+        }
+    }
+
+    /**
+     * 10. 组合总和 III
+     * 找出所有相加之和为 n 的 k 个数的组合，且满足下列条件：
+     * 只使用数字1到9
+     * 每个数字 最多使用一次
+     * 返回 所有可能的有效组合的列表 。该列表不能包含相同的组合两次，组合可以以任何顺序返回。
+     * 示例 1:
+     * 输入: k = 3, n = 7
+     * 输出: [[1,2,4]]
+     * 解释:
+     * 1 + 2 + 4 = 7
+     * 没有其他符合的组合了。
+     * 示例 2:
+     * 输入: k = 3, n = 9
+     * 输出: [[1,2,6], [1,3,5], [2,3,4]]
+     * 解释:
+     * 1 + 2 + 6 = 9
+     * 1 + 3 + 5 = 9
+     * 2 + 3 + 4 = 9
+     * 没有其他符合的组合了。
+     * 示例 3:
+     * 输入: k = 4, n = 1
+     * 输出: []
+     * 解释: 不存在有效的组合。
+     * 在[1,9]范围内使用4个不同的数字，我们可以得到的最小和是1+2+3+4 = 10，因为10 > 1，没有有效的组合。
+     */
+    public List<List<Integer>> combinationSum3(int k, int n) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> subAns = new ArrayList<>();
+        backTrackingV6(ans, subAns, k, n, 1);
+        return ans;
+    }
+
+    private void backTrackingV6(List<List<Integer>> ans, List<Integer> subAns, int k, int target, int start) {
+        if (target == 0 && subAns.size() == k){
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        for (int i = start; i <= 9; i++) {
+            if (i <= target){
+                subAns.add(i);
+                backTrackingV6(ans, subAns, k, target - i, i + 1);
+                subAns.remove(subAns.size() - 1);
+            }
+        }
     }
 
 
