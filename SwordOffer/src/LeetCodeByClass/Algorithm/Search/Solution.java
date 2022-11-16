@@ -1,8 +1,6 @@
 package LeetCodeByClass.Algorithm.Search;
 
 
-import org.testng.internal.collections.Pair;
-
 import java.util.*;
 
 class Solution {
@@ -1051,6 +1049,109 @@ class Solution {
                 subAns.remove(subAns.size() - 1);
             }
         }
+    }
+
+    /**
+     * 11. 子集
+     * 给你一个整数数组 nums ，数组中的元素 互不相同 。返回该数组所有可能的子集（幂集）。
+     * 解集 不能 包含重复的子集。你可以按 任意顺序 返回解集。
+     * 示例 1：
+     * 输入：nums = [1,2,3]
+     * 输出：[[],[1],[2],[1,2],[3],[1,3],[2,3],[1,2,3]]
+     * 示例 2：
+     * 输入：nums = [0]
+     * 输出：[[],[0]]
+     */
+    public List<List<Integer>> subsets(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> subAns = new ArrayList<>();
+        backTrackingV7(ans, subAns, nums, 0);
+        return ans;
+    }
+    private void backTrackingV7(List<List<Integer>> ans, List<Integer> subAns, int[] nums, int start) {
+        if (subAns.isEmpty() || subAns.size() < nums.length) ans.add(new ArrayList<>(subAns));
+        if (subAns.size() == nums.length){
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        for (int i = start; i < nums.length; i++) {
+            subAns.add(nums[i]);
+            backTrackingV7(ans, subAns, nums, i+1);
+            subAns.remove(subAns.size() - 1);
+        }
+    }
+
+    /**
+     * 12. 子集 II
+     * 给你一个整数数组 nums ，其中可能包含重复元素，请你返回该数组所有可能的子集（幂集）。
+     * 解集 不能 包含重复的子集。返回的解集中，子集可以按 任意顺序 排列。
+     * 示例 1：
+     * 输入：nums = [1,2,2]
+     * 输出：[[],[1],[1,2],[1,2,2],[2],[2,2]]
+     * 示例 2：
+     * 输入：nums = [0]
+     * 输出：[[],[0]]
+     */
+    public List<List<Integer>> subsetsWithDup(int[] nums) {
+        List<List<Integer>> ans = new ArrayList<>();
+        List<Integer> subAns = new ArrayList<>();
+        boolean[] visited = new boolean[nums.length];
+        Arrays.sort(nums); // TODO: 2022/11/16  也就是说这一步必不可少
+        backTrackingV7(ans, subAns, nums, 0, visited);
+        return ans;
+    }
+    private void backTrackingV7(List<List<Integer>> ans, List<Integer> subAns, int[] nums, int start, boolean[] visited) {
+        if (subAns.isEmpty() || subAns.size() < nums.length) ans.add(new ArrayList<>(subAns));
+        if (subAns.size() == nums.length){
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        for (int i = start; i < nums.length; i++) {
+            if (i > 0 && nums[i] == nums[i-1] && !visited[i-1]) continue; // TODO: 2022/11/16 这个地方如果使用这种方式去重的话，要求数组一定要排好序
+            if (visited[i]) continue;
+            visited[i] = true;
+            subAns.add(nums[i]);
+            backTrackingV7(ans, subAns, nums, i, visited);
+            subAns.remove(subAns.size() - 1);
+            visited[i] = false;
+        }
+    }
+
+    /**
+     * 13. 分割回文串
+     * 给你一个字符串 s，请你将 s 分割成一些子串，使每个子串都是 回文串 。返回 s 所有可能的分割方案。
+     * 回文串 是正着读和反着读都一样的字符串。
+     * 示例 1：
+     * 输入：s = "aab"
+     * 输出：[["a","a","b"],["aa","b"]]
+     * 示例 2：
+     * 输入：s = "a"
+     * 输出：[["a"]]
+     */
+    public List<List<String>> partition(String s) {
+        List<List<String>> ans = new ArrayList<>();
+        List<String> subAns = new ArrayList<>();
+        backTracking(ans, subAns, s);
+        return ans;
+    }
+    private void backTracking(List<List<String>> ans, List<String> subAns, String s) {
+        if (s.length() == 0) { // 这里代表已经访问完了给定字符串 s 的所有字符，可以添加结果了
+            ans.add(new ArrayList<>(subAns));
+            return;
+        }
+        for (int i = 0; i < s.length(); i++) {
+            if (isHuiWen(s, 0, i)) {
+                subAns.add(s.substring(0, i + 1)); // TODO: 2022/11/16 这里体现出切割了，如果把 i 之前的串添加进去，下面就要判断 i 之后的串
+                backTracking(ans, subAns, s.substring(i + 1));
+                subAns.remove(subAns.size() - 1);
+            }
+        }
+    }
+    public boolean isHuiWen(String s, int left, int right) {
+        while (left < right){
+            if(s.charAt(left++) != s.charAt(right--)) return false;
+        }
+        return true;
     }
 
 

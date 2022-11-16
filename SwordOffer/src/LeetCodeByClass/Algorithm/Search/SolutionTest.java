@@ -86,4 +86,23 @@ public class SolutionTest {
     public void combinationSum3() {
         System.out.println(solution.combinationSum3(4, 1));
     }
+
+    @Test
+    public void subsets() {
+        int[] nums = {1,2,3};
+        System.out.println(solution.subsets(nums));
+    }
+
+    @Test
+    public void subsetsWithDup() {
+        int[] nums = {1,2,2};
+        System.out.println(solution.subsetsWithDup(nums));
+    }
+
+
+    @Test
+    public void partition() {
+        String s = "aab";
+        System.out.println(solution.partition(s));
+    }
 }
