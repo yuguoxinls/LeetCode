@@ -15,4 +15,15 @@ public class SolutionTest {
     public void uniquePaths() {
         System.out.println(j.uniquePaths(3, 2));
     }
+
+    @Test
+    public void integerBreak() {
+        System.out.println(j.integerBreak(10));
+    }
+
+    @Test
+    public void numDecodings() {
+        String s = "2206";
+        System.out.println(j.numDecodings(s));
+    }
 }
