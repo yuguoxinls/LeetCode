@@ -1,6 +1,8 @@
 package LeetCodeByClass.Algorithm.DynamicProgramming;
 
 import java.util.Arrays;
+import java.util.Comparator;
+import java.util.OptionalInt;
 
 public class Solution { // TODO: 2022/11/17 整个一个大todo
 
@@ -306,24 +308,154 @@ public class Solution { // TODO: 2022/11/17 整个一个大todo
         return dp[s.length()];
     }
 
+    // 最长递增子序列
+    /**
+     * 1. 最长递增子序列
+     * 给你一个整数数组 nums ，找到其中最长严格递增子序列的长度。
+     * 子序列 是由数组派生而来的序列，删除（或不删除）数组中的元素而不改变其余元素的顺序。例如，[3,6,2,7] 是数组 [0,3,1,6,2,2,7] 的子序列。
+     * 示例 1：
+     * 输入：nums = [10,9,2,5,3,7,101,18]
+     * 输出：4
+     * 解释：最长递增子序列是 [2,3,7,101]，因此长度为 4 。
+     * 示例 2：
+     * 输入：nums = [0,1,0,3,2,3]
+     * 输出：4
+     * 示例 3：
+     * 输入：nums = [7,7,7,7,7,7,7]
+     * 输出：1
+     */
+    public int lengthOfLIS(int[] nums) {
+        /**
+         * 1. 子问题：设 dp[i]表示以 nums[i]结尾的最长递增子序列的长度，则 max(dp)即是答案
+         * 2. 状态转移：
+         *  (1) 首先，dp[0]表示以 nums第一个元素结尾的最长递增子序列的长度，肯定是 1
+         *  (2) 因为不是连续子数组，因此不能简单判断，要在每次判断时遍历[0,i)
+         *  (3) 如果 nums[i] > nums[j], 此时满足题目要求，dp[i] = dp[j] + 1
+         *  (4) 如果 nums[i] <= nums[j], 不满足要求直接跳过
+         *  (5) dp[i] == max(dp[j]) j in [0,i)
+         */
+        /*int[] dp = new int[nums.length];
+        Arrays.fill(dp, 1);
+        int res = 0;
+        for(int i = 0; i < nums.length; i++) {
+            for(int j = 0; j < i; j++) {
+                if(nums[j] < nums[i]) dp[i] = Math.max(dp[i], dp[j] + 1);
+            }
+            res = Math.max(res, dp[i]);
+        }
+        return res;*/ // 时间复杂度太高，可用二分查找降低时间复杂度
+        int[] tails = new int[nums.length]; // tails[i] 存储长度为 i + 1 的最长递增子序列的最后一个元素
+        int len = 0;
+        for(int num : nums) {
+            int index = binarySearch(tails, len, num); // binarySearch返回num在tails数组中的索引位置
+            tails[index] = num; // 把num放到对应位置
+            if(len == index) len++;
+        }
+        return len;
+    }
+    private int binarySearch(int[] arr, int right, int target){
+        int left = 0;
+        while (left < right){
+            int mid = left + (right - left)/2;
+            if (arr[mid] == target) return mid;
+            else if (arr[mid] > target) right = mid;
+            else left = mid + 1;
+        }
+        return left;
+    }
 
+    /**
+     * 2. 最长数对链
+     * 给出 n 个数对。 在每一个数对中，第一个数字总是比第二个数字小。
+     * 现在，我们定义一种跟随关系，当且仅当 b < c 时，数对(c, d) 才可以跟在 (a, b) 后面。我们用这种形式来构造一个数对链。
+     * 给定一个数对集合，找出能够形成的最长数对链的长度。你不需要用到所有的数对，你可以以任何顺序选择其中的一些数对来构造。
+     * 示例：
+     * 输入：[[1,2], [2,3], [3,4]]
+     * 输出：2
+     * 解释：最长的数对链是 [1,2] -> [3,4]
+     */
+    public int findLongestChain(int[][] pairs) { // TODO: 2022/11/21 自己对照上边的第一题写出来的，也能过，但是时间太长，应该也能用类似二分查找的方式优化
+        /**
+         * 1. 子问题：dp[i]表示以第 i 个数对为结尾的最长数对链的长度，i 从0开始
+         * 2. 状态转移：对于第 i 个数对，同样没有要求是原数组中的连续数对，因此要遍历[0,i)
+         *  (1) 对于第 j 个数对，pairs[j]，如果pairs[j][1] < pairs[i][0]，满足要求，此时的最长数对链的长度 dp[j]+1
+         *  (2) 对于第 j 个数对，pairs[j]，如果pairs[j][1] >= pairs[i][0]，不满足要求，直接跳过
+         */
+        Arrays.sort(pairs, (o1, o2) -> {return o1[1] - o2[1];});
+        int[] dp = new int[pairs.length];
+        Arrays.fill(dp, 1);
+        int res = 0;
+        for (int i = 0; i < dp.length; i++) {
+            for (int j = 0; j < i; j++) {
+                if (pairs[j][1] < pairs[i][0]) dp[i] = Math.max(dp[i], dp[j]+1);
+            }
+            res = Math.max(res,dp[i]);
+        }
+        return res;
+    }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    /**
+     * 3. 摆动序列
+     * 如果连续数字之间的差严格地在正数和负数之间交替，则数字序列称为 摆动序列 。第一个差（如果存在的话）可能是正数或负数。仅有一个元素或者含两个不等元素的序列也视作摆动序列。
+     * 例如， [1, 7, 4, 9, 2, 5] 是一个 摆动序列 ，因为差值 (6, -3, 5, -7, 3) 是正负交替出现的。
+     * 相反，[1, 4, 7, 2, 5] 和 [1, 7, 4, 5, 5] 不是摆动序列，第一个序列是因为它的前两个差值都是正数，第二个序列是因为它的最后一个差值为零。
+     * 子序列 可以通过从原始序列中删除一些（也可以不删除）元素来获得，剩下的元素保持其原始顺序。
+     * 给你一个整数数组 nums ，返回 nums 中作为 摆动序列 的 最长子序列的长度 。
+     * 示例 1：
+     * 输入：nums = [1,7,4,9,2,5]
+     * 输出：6
+     * 解释：整个序列均为摆动序列，各元素之间的差值为 (6, -3, 5, -7, 3) 。
+     * 示例 2：
+     * 输入：nums = [1,17,5,10,13,15,10,5,16,8]
+     * 输出：7
+     * 解释：这个序列包含几个长度为 7 摆动序列。
+     * 其中一个是 [1, 17, 10, 13, 10, 16, 8] ，各元素之间的差值为 (16, -7, 3, -3, 6, -8) 。
+     * 示例 3：
+     * 输入：nums = [1,2,3,4,5,6,7,8,9]
+     * 输出：2
+     */
+    public int wiggleMaxLength(int[] nums) {
+        /**
+         * 1. 子问题：dp[i]表示以nums[i]结尾的最长摆动子序列的长度，max(dp)即是答案
+         * 2. 状态转移：同样没要求连续，也要遍历[0,i)
+         * (1) 如果 (nums[j]-nums[j-1]) * (nums[j-1]-nums[j-2]) < 0, 说明差值异号，满足摆动序列要求
+         * (2) 否则直接跳过
+         * 由于仅有一个元素或者两个不等元素也视作摆动序列，因此dp[0]=1, dp[1] = 1  (满足条件的情况下)
+         */
+        /*if (nums.length == 0) return 0;
+        if (nums.length == 1) return 1;
+        int[] dp = new int[nums.length];
+        Arrays.fill(dp, 1);
+        dp[1] = 2;
+        int res = 0;
+        for (int i = 2; i < dp.length; i++) {
+            for (int j = 2; j < i; j++) {
+                if ((nums[j]-nums[j-1]) * (nums[j-1]-nums[j-2]) < 0) dp[i] = Math.max(dp[i], dp[j]+1);
+            }
+            res = Math.max(res, dp[i]);
+        }
+        return res;*/ // TODO: 2022/11/21 自己写的，有bug
+        int n = nums.length;
+        if (n < 2) {
+            return n;
+        }
+        int[] up = new int[n];
+        int[] down = new int[n];
+        up[0] = down[0] = 1;
+        for (int i = 1; i < n; i++) {
+            if (nums[i] > nums[i - 1]) {
+                up[i] = Math.max(up[i - 1], down[i - 1] + 1);
+                down[i] = down[i - 1];
+            } else if (nums[i] < nums[i - 1]) {
+                up[i] = up[i - 1];
+                down[i] = Math.max(up[i - 1] + 1, down[i - 1]);
+            } else {
+                up[i] = up[i - 1];
+                down[i] = down[i - 1];
+            }
+        }
+        return Math.max(up[n - 1], down[n - 1]);
+    }
 
 
 }

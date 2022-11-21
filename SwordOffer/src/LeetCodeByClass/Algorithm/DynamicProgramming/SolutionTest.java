@@ -26,4 +26,22 @@ public class SolutionTest {
         String s = "2206";
         System.out.println(j.numDecodings(s));
     }
+
+    @Test
+    public void lengthOfLIS() {
+        int[] nums = {10,9,2,5,3,7,101,18};
+        System.out.println(j.lengthOfLIS(nums));
+    }
+
+    @Test
+    public void findLongestChain() {
+        int[][] pairs = {{3,4},{1,2},{2,3}};
+        System.out.println(j.findLongestChain(pairs));
+    }
+
+    @Test
+    public void wiggleMaxLength() {
+        int[] nums = {1,7,4,9,2,5};
+        System.out.println(j.wiggleMaxLength(nums));
+    }
 }
