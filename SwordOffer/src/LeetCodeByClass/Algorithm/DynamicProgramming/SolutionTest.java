@@ -37,11 +37,18 @@ public class SolutionTest {
     public void findLongestChain() {
         int[][] pairs = {{3,4},{1,2},{2,3}};
         System.out.println(j.findLongestChain(pairs));
+
     }
 
     @Test
-    public void wiggleMaxLength() {
-        int[] nums = {1,7,4,9,2,5};
-        System.out.println(j.wiggleMaxLength(nums));
+    public void longestCommonSubsequence() {
+        String text1 = "abc", text2 = "def";
+        System.out.println(j.longestCommonSubsequence(text1, text2));
+    }
+
+    @Test
+    public void canPartition() {
+        int[] nums = {1,5,11,5};
+        System.out.println(j.canPartition(nums));
     }
 }

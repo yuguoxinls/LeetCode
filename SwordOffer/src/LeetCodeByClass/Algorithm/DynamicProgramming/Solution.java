@@ -1,8 +1,6 @@
 package LeetCodeByClass.Algorithm.DynamicProgramming;
 
-import java.util.Arrays;
-import java.util.Comparator;
-import java.util.OptionalInt;
+import java.util.*;
 
 public class Solution { // TODO: 2022/11/17 整个一个大todo
 
@@ -456,6 +454,129 @@ public class Solution { // TODO: 2022/11/17 整个一个大todo
         }
         return Math.max(up[n - 1], down[n - 1]);
     }
+
+    // 最长公共子序列
+    /**
+     * 1. 最长公共子序列
+     * 给定两个字符串 text1 和 text2，返回这两个字符串的最长 公共子序列 的长度。如果不存在 公共子序列 ，返回 0 。
+     * 一个字符串的 子序列 是指这样一个新的字符串：它是由原字符串在不改变字符的相对顺序的情况下删除某些字符（也可以不删除任何字符）后组成的新字符串。
+     * 例如，"ace" 是 "abcde" 的子序列，但 "aec" 不是 "abcde" 的子序列。
+     * 两个字符串的 公共子序列 是这两个字符串所共同拥有的子序列。
+     * 示例 1：
+     * 输入：text1 = "abcde", text2 = "ace"
+     * 输出：3
+     * 解释：最长公共子序列是 "ace" ，它的长度为 3 。
+     * 示例 2：
+     * 输入：text1 = "abc", text2 = "abc"
+     * 输出：3
+     * 解释：最长公共子序列是 "abc" ，它的长度为 3 。
+     * 示例 3：
+     * 输入：text1 = "abc", text2 = "def"
+     * 输出：0
+     * 解释：两个字符串没有公共子序列，返回 0 。
+     */
+    public int longestCommonSubsequence(String text1, String text2) {
+        /**
+         * 经典的二维dp问题
+         * 符号定义：text[0:i] 表示 text 的长度为 i 的前缀
+         * 1. 子问题：令dp[i][j]表示 text1[0:i], text2[0:j]的最长公共子序列的长度
+         * 2. 状态转移：
+         * (1) 边界情况：i == 0，text1[0:0]表示长度为 0 的前缀，也就是空串，当然是任何串的子串，因此dp[0][j]=0
+         *              j == 0, 同理, dp[i][0]=0
+         * (2) i > 0, j > 0:
+         *  如果text1[i-1] == text2[j-1]，说明是公共字符，把它加进来，公共子串的长度增加 1，即 dp[i][j] = dp[i-1][j-1] + 1
+         *  如果text1[i-1] != text2[j-1], 此时应该考虑
+         *    (1)text1[0:i]和text2[0:j-1]的最长公共子序列
+         *    (2)text2[0:i-1]和text2[0:j]的最长公共子序列
+         *  应该取二者的最大值，即：dp[i][j] = max(dp[i-1][j], dp[i][j-1])
+         */
+        int[][] dp = new int[text1.length()+1][text2.length()+1];
+        for (int i = 1; i < dp.length; i++) {
+            for (int j = 1; j < dp[0].length; j++) {
+                if (text1.charAt(i-1) == text2.charAt(j-1)) dp[i][j] = dp[i-1][j-1] + 1;
+                else dp[i][j] = Math.max(dp[i-1][j], dp[i][j-1]);
+            }
+        }
+        return dp[text1.length()][text2.length()];
+    }
+
+    // 0-1背包问题
+    /**
+     * 1. 分割等和子集
+     * 给你一个 只包含正整数 的 非空 数组 nums 。请你判断是否可以将这个数组分割成两个子集，使得两个子集的元素和相等。
+     * 示例 1：
+     * 输入：nums = [1,5,11,5]
+     * 输出：true
+     * 解释：数组可以分割成 [1, 5, 5] 和 [11] 。
+     * 示例 2：
+     * 输入：nums = [1,2,3,5]
+     * 输出：false
+     * 解释：数组不能分割成两个元素和相等的子集。
+     */
+    public boolean canPartition(int[] nums) {
+        int sum = computeArraySum(nums);
+        if (sum % 2 != 0) { // 两个相等的数相加的和必然是偶数
+            return false;
+        }
+        int w = sum / 2; // 获得其中一个子集的和，看作背包的容量
+        boolean[] dp = new boolean[w + 1];
+        dp[0] = true;
+        for (int num : nums) {                 // 0-1 背包一个物品只能用一次
+            for (int i = w; i >= num; i--) {   // 从后往前，先计算 dp[i] 再计算 dp[i-num]
+                dp[i] = dp[i] || dp[i - num];
+            }
+        }
+        return dp[w];
+    }
+    private int computeArraySum(int[] nums) {
+        int sum = 0;
+        for (int num : nums) {
+            sum += num;
+        }
+        return sum;
+    }
+
+    /**
+     * 2. 目标和
+     * 给你一个整数数组 nums 和一个整数 target 。
+     * 向数组中的每个整数前添加 '+' 或 '-' ，然后串联起所有整数，可以构造一个 表达式 ：
+     * 例如，nums = [2, 1] ，可以在 2 之前添加 '+' ，在 1 之前添加 '-' ，然后串联起来得到表达式 "+2-1" 。
+     * 返回可以通过上述方法构造的、运算结果等于 target 的不同 表达式 的数目。
+     * 示例 1：
+     * 输入：nums = [1,1,1,1,1], target = 3
+     * 输出：5
+     * 解释：一共有 5 种方法让最终目标和为 3 。
+     * -1 + 1 + 1 + 1 + 1 = 3
+     * +1 - 1 + 1 + 1 + 1 = 3
+     * +1 + 1 - 1 + 1 + 1 = 3
+     * +1 + 1 + 1 - 1 + 1 = 3
+     * +1 + 1 + 1 + 1 - 1 = 3
+     * 示例 2：
+     * 输入：nums = [1], target = 1
+     * 输出：1
+     */
+    public int findTargetSumWays(int[] nums, int target) {
+        /**
+         * 该问题可以转换为 Subset Sum 问题，从而使用 0-1 背包的方法来求解。
+         * 可以将这组数看成两部分，P 和 N，其中 P 使用正号，N 使用负号，有以下推导：
+         *  sum(P) - sum(N) = target => sum(P) + sum(N) + sum(P) - sum(N) = target + sum(P) + sum(N) => 2 * sum(P) = target + sum(nums)
+         *  => sum(P) = (target + sum(nums))/2
+         *  也就是说，找到一个子集，该子集的和等于(target + sum(nums))/2，就说明存在解
+         */
+        int sum = computeArraySum(nums);
+        if (sum < target || (sum+target) % 2 == 1) return 0;
+        int w = (sum+target) / 2;
+        if (w < 0) return 0; // TODO: 2022/11/22 这是答案上没想到的特殊用例
+        int[] dp = new int[w + 1];
+        dp[0] = 1;
+        for (int num : nums) {
+            for (int i = w; i >= num; i--) {
+                dp[i] = dp[i] + dp[i - num];
+            }
+        }
+        return dp[w];
+    }
+
 
 
 }
