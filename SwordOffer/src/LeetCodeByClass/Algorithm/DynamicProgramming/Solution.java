@@ -577,6 +577,141 @@ public class Solution { // TODO: 2022/11/17 整个一个大todo
         return dp[w];
     }
 
+    /**
+     * 3. 一和零
+     * 给你一个二进制字符串数组 strs 和两个整数 m 和 n 。
+     * 请你找出并返回 strs 的最大子集的长度，该子集中 最多 有 m 个 0 和 n 个 1 。
+     * 如果 x 的所有元素也是 y 的元素，集合 x 是集合 y 的 子集 。
+     * 示例 1：
+     * 输入：strs = ["10", "0001", "111001", "1", "0"], m = 5, n = 3
+     * 输出：4
+     * 解释：最多有 5 个 0 和 3 个 1 的最大子集是 {"10","0001","1","0"} ，因此答案是 4 。
+     * 其他满足题意但较小的子集包括 {"0001","1"} 和 {"10","1","0"} 。{"111001"} 不满足题意，因为它含 4 个 1 ，大于 n 的值 3 。
+     * 示例 2：
+     * 输入：strs = ["10", "0", "1"], m = 1, n = 1
+     * 输出：2
+     * 解释：最大的子集是 {"0", "1"} ，所以答案是 2 。
+     */
+    public int findMaxForm(String[] strs, int m, int n) {
+        /**
+         * 这道题和经典的背包问题非常相似，但是和经典的背包问题只有一种容量不同，这道题有两种容量，即选取的字符串子集中的 0 和 1 的数量上限。
+         * 经典的背包问题可以使用二维动态规划求解，两个维度分别是物品和容量。这道题有两种容量，因此需要使用三维动态规划求解，三个维度分别是字符串、0 的容量和 1 的容量。
+         * 定义三维数组dp，其中 dp[i][j][k]表示在前 i 个字符串中，使用 j个 0和 k个 1 的情况下最多可以得到的字符串数量。假设数组 str 的长度为 l，则最终答案为 dp[l][m][n]。
+         * 当没有任何字符串可以使用时，可以得到的字符串数量只能是 0，因此动态规划的边界条件是：当 i=0时，对任意 0≤j≤m和 0≤k≤n，都有 dp[i][j][k]=0
+         * 当 1≤i≤l时，对于 strs中的第 i个字符串（计数从 1 开始），首先遍历该字符串得到其中的 0 和 1 的数量，分别记为 zeros 和 ones，然后对于 0≤j≤m 和 0≤k≤n，计算 dp[i][j][k]的值。
+         * 当 0 和 1 的容量分别是 j 和 k 时，考虑以下两种情况：
+         *      如果 j<zeros 或 k<ones，则不能选第 i 个字符串，此时有 dp[i][j][k]=dp[i−1][j][k]；
+         *      如果 j≥zeros 且 k≥ones，则
+         *              如果不选第 i 个字符串，有 dp[i][j][k]=dp[i−1][j][k]，
+         *              如果选第 i 个字符串，有 dp[i][j][k]=dp[i−1][j−zeros][k−ones]+1，
+         *      dp[i][j][k]的值应取上面两项中的最大值。
+         */
+        /*int length = strs.length;
+        int[][][] dp = new int[length + 1][m + 1][n + 1];
+        for (int i = 1; i <= length; i++) {
+            int[] zerosOnes = getZerosOnes(strs[i - 1]);
+            int zeros = zerosOnes[0], ones = zerosOnes[1];
+            for (int j = 0; j <= m; j++) {
+                for (int k = 0; k <= n; k++) {
+                    dp[i][j][k] = dp[i - 1][j][k];
+                    if (j >= zeros && k >= ones) {
+                        dp[i][j][k] = Math.max(dp[i][j][k], dp[i - 1][j - zeros][k - ones] + 1);
+                    }
+                }
+            }
+        }
+        return dp[length][m][n];*/
+        // TODO: 2022/11/23 空间优化
+        if (strs == null || strs.length == 0) {
+            return 0;
+        }
+        int[][] dp = new int[m + 1][n + 1];
+        for (String s : strs) {    // 每个字符串只能用一次
+            int ones = 0, zeros = 0;
+            for (char c : s.toCharArray()) {
+                if (c == '0') {
+                    zeros++;
+                } else {
+                    ones++;
+                }
+            }
+            for (int i = m; i >= zeros; i--) {
+                for (int j = n; j >= ones; j--) {
+                    dp[i][j] = Math.max(dp[i][j], dp[i - zeros][j - ones] + 1);
+                }
+            }
+        }
+        return dp[m][n];
+    }
+    public int[] getZerosOnes(String str) {
+        int[] zerosOnes = new int[2];
+        int length = str.length();
+        for (int i = 0; i < length; i++) {
+            zerosOnes[str.charAt(i) - '0']++;
+        }
+        return zerosOnes;
+    }
 
+    /**
+     * 4. 零钱兑换
+     * 给你一个整数数组 coins ，表示不同面额的硬币；以及一个整数 amount ，表示总金额。
+     * 计算并返回可以凑成总金额所需的 最少的硬币个数 。如果没有任何一种硬币组合能组成总金额，返回 -1 。
+     * 你可以认为每种硬币的数量是无限的。
+     * 示例 1：
+     * 输入：coins = [1, 2, 5], amount = 11
+     * 输出：3
+     * 解释：11 = 5 + 5 + 1
+     * 示例 2：
+     * 输入：coins = [2], amount = 3
+     * 输出：-1
+     * 示例 3：
+     * 输入：coins = [1], amount = 0
+     * 输出：0
+     */
+    public int coinChange(int[] coins, int amount) {
+        /**
+         * 因为硬币可以重复使用，因此这是一个完全背包问题。完全背包只需要将 0-1 背包的逆序遍历 dp 数组改为正序遍历即可。
+         */
+        if (amount == 0 || coins == null) return 0;
+        int[] dp = new int[amount + 1];
+        for (int coin : coins) {
+            for (int i = coin; i <= amount; i++) { //将逆序遍历改为正序遍历
+                if (i == coin) {
+                    dp[i] = 1;
+                } else if (dp[i] == 0 && dp[i - coin] != 0) {
+                    dp[i] = dp[i - coin] + 1;
 
+                } else if (dp[i - coin] != 0) {
+                    dp[i] = Math.min(dp[i], dp[i - coin] + 1);
+                }
+            }
+        }
+        return dp[amount] == 0 ? -1 : dp[amount];
+    }
+
+    /**
+     * 5. 零钱兑换 II  https://leetcode.cn/problems/coin-change-ii/
+     * 给你一个整数数组 coins 表示不同面额的硬币，另给一个整数 amount 表示总金额。
+     * 请你计算并返回可以凑成总金额的硬币组合数。如果任何硬币组合都无法凑出总金额，返回 0 。
+     * 假设每一种面额的硬币有无限个。
+     * 题目数据保证结果符合 32 位带符号整数。
+     * 示例 1：
+     * 输入：amount = 5, coins = [1, 2, 5]
+     * 输出：4
+     * 解释：有四种方式可以凑成总金额：
+     * 5=5
+     * 5=2+2+1
+     * 5=2+1+1+1
+     * 5=1+1+1+1+1
+     * 示例 2：
+     * 输入：amount = 3, coins = [2]
+     * 输出：0
+     * 解释：只用面额 2 的硬币不能凑成总金额 3 。
+     * 示例 3：
+     * 输入：amount = 10, coins = [10]
+     * 输出：1
+     */
+//    public int change(int amount, int[] coins) {
+//
+//    }
 }

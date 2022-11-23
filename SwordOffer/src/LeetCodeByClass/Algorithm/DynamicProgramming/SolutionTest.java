@@ -51,4 +51,16 @@ public class SolutionTest {
         int[] nums = {1,5,11,5};
         System.out.println(j.canPartition(nums));
     }
+
+    @Test
+    public void findMaxForm() {
+        String[] strs = {"10","0001","111001","1","0"};
+        System.out.println(j.findMaxForm(strs, 3, 4));
+    }
+
+    @Test
+    public void coinChange() {
+        int[] coins = {1,2147483647};
+        System.out.println(j.coinChange(coins, 2));
+    }
 }
