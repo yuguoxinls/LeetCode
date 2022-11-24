@@ -711,7 +711,105 @@ public class Solution { // TODO: 2022/11/17 整个一个大todo
      * 输入：amount = 10, coins = [10]
      * 输出：1
      */
-//    public int change(int amount, int[] coins) {
-//
-//    }
+    public int change(int amount, int[] coins) {
+        /**
+         * 完全背包问题，使用 dp 记录可达成目标的组合数目。
+         */
+        if (coins == null) {
+            return 0;
+        }
+        int[] dp = new int[amount + 1];
+        dp[0] = 1;
+        for (int coin : coins) {
+            for (int i = coin; i <= amount; i++) {
+                dp[i] += dp[i - coin];
+            }
+        }
+        return dp[amount];
+    }
+
+    /**
+     * 6. 单词拆分
+     * 给你一个字符串 s 和一个字符串列表 wordDict 作为字典。请你判断是否可以利用字典中出现的单词拼接出 s 。
+     * 注意：不要求字典中出现的单词全部都使用，并且字典中的单词可以重复使用。
+     * 示例 1：
+     * 输入: s = "leetcode", wordDict = ["leet", "code"]
+     * 输出: true
+     * 解释: 返回 true 因为 "leetcode" 可以由 "leet" 和 "code" 拼接成。
+     * 示例 2：
+     * 输入: s = "applepenapple", wordDict = ["apple", "pen"]
+     * 输出: true
+     * 解释: 返回 true 因为 "applepenapple" 可以由 "apple" "pen" "apple" 拼接成。
+     *      注意，你可以重复使用字典中的单词。
+     * 示例 3：
+     * 输入: s = "catsandog", wordDict = ["cats", "dog", "sand", "and", "cat"]
+     * 输出: false
+     */
+    public boolean wordBreak(String s, List<String> wordDict) {
+        /**
+         * 可以重复使用，因此是完全背包问题
+         * 求解 顺序的完全背包问题 时，对物品的迭代应该放在最里层，对背包的迭代放在外层，只有这样才能让物品按一定顺序放入背包中。
+         */
+        int n = s.length();
+        boolean[] dp = new boolean[n + 1];
+        dp[0] = true;
+        for (int i = 1; i <= n; i++) {
+            for (String word : wordDict) {   // 对物品的迭代应该放在最里层
+                int len = word.length();
+                if (len <= i && word.equals(s.substring(i - len, i))) {
+                    dp[i] = dp[i] || dp[i - len];
+                }
+            }
+        }
+        return dp[n];
+    }
+
+    /**
+     * 7. 组合总和 Ⅳ
+     * 给你一个由 不同 整数组成的数组 nums ，和一个目标整数 target 。请你从 nums 中找出并返回总和为 target 的元素组合的个数。
+     * 题目数据保证答案符合 32 位整数范围。
+     * 示例 1：
+     * 输入：nums = [1,2,3], target = 4
+     * 输出：7
+     * 解释：
+     * 所有可能的组合为：
+     * (1, 1, 1, 1)
+     * (1, 1, 2)
+     * (1, 2, 1)
+     * (1, 3)
+     * (2, 1, 1)
+     * (2, 2)
+     * (3, 1)
+     * 请注意，顺序不同的序列被视作不同的组合。
+     * 示例 2：
+     * 输入：nums = [9], target = 3
+     * 输出：0
+     */
+    public int combinationSum4(int[] nums, int target) {
+        /**
+         * 同样是涉及顺序的完全背包问题
+         */
+        /*if (nums == null || nums.length == 0) {
+            return 0;
+        }
+        int[] maximum = new int[target + 1];
+        maximum[0] = 1;
+        Arrays.sort(nums);
+        for (int i = 1; i <= target; i++) {
+            for (int j = 0; j < nums.length && nums[j] <= i; j++) {
+                maximum[i] += maximum[i - nums[j]];
+            }
+        }
+        return maximum[target];*/
+        int[] dp = new int[target + 1]; // TODO: 2022/11/24 官方题解，更快
+        dp[0] = 1;
+        for (int i = 1; i <= target; i++) {
+            for (int num : nums) {
+                if (num <= i) {
+                    dp[i] += dp[i - num];
+                }
+            }
+        }
+        return dp[target];
+    }
 }
