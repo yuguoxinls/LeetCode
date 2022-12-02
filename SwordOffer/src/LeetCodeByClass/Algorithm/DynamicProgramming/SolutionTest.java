@@ -1,6 +1,6 @@
 package LeetCodeByClass.Algorithm.DynamicProgramming;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 public class SolutionTest {
     Solution j = new Solution();

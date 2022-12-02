@@ -990,11 +990,19 @@ public class Solution { // TODO: 2022/11/17 整个一个大todo
      * 输入：n = 1
      * 输出：0
      */
-    /*public int minSteps(int n) {
-        *//**
-         * 1. 子问题 dp[i]表示打印 i 个'A'需要使用最少的操作次数
-         *//*
-    }*/
+    public int minSteps(int n) {  // TODO: 2022/12/2 是真看不懂
+        int[] f = new int[n + 1];
+        for (int i = 2; i <= n; ++i) {
+            f[i] = Integer.MAX_VALUE;
+            for (int j = 1; j * j <= i; ++j) {
+                if (i % j == 0) {
+                    f[i] = Math.min(f[i], f[j] + i / j);
+                    f[i] = Math.min(f[i], f[i / j] + j);
+                }
+            }
+        }
+        return f[n];
+    }
 
 
 

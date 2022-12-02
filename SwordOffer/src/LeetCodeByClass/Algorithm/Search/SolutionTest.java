@@ -1,7 +1,7 @@
 package LeetCodeByClass.Algorithm.Search;
 
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 public class SolutionTest {
     Solution solution = new Solution();

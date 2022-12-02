@@ -1,7 +1,7 @@
 package LeetCodeByClass.Algorithm.DynamicProgramming;
 
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 public class FibonacciTest {
     Fibonacci fibonacci = new Fibonacci();

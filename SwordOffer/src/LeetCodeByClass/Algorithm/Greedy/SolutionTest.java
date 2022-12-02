@@ -1,7 +1,7 @@
 package LeetCodeByClass.Algorithm.Greedy;
 
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 public class SolutionTest {
 

@@ -1,6 +1,6 @@
 package LeetCodeByClass.Algorithm.BinarySearch;
 
-import org.testng.annotations.Test;
+import org.junit.Test;
 
 import java.util.Arrays;
 
