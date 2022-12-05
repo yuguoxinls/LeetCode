@@ -62,4 +62,9 @@ public void testConvertToTitle(){
     System.out.println(s.convertToTitle(2147483647));
 }
 
+@Test
+public void testTrailingZeroes(){
+    System.out.println(s.trailingZeroes(3));
+}
+
 } 

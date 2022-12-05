@@ -170,4 +170,88 @@ public class Solution {
         return ans.reverse().toString();
     }
 
+    /**
+     * 阶乘
+     * 1. 阶乘后的零
+     * 给定一个整数 n ，返回 n! 结果中尾随零的数量。
+     * 提示 n! = n * (n - 1) * (n - 2) * ... * 3 * 2 * 1
+     * 示例 1：
+     * 输入：n = 3
+     * 输出：0
+     * 解释：3! = 6 ，不含尾随 0
+     * 示例 2：
+     * 输入：n = 5
+     * 输出：1
+     * 解释：5! = 120 ，有一个尾随 0
+     * 示例 3：
+     * 输入：n = 0
+     * 输出：0
+     */
+    public int trailingZeroes(int n) { // TODO: 2022/12/5
+        /**
+         * 尾部的 0 由 2 * 5 得来，2 的数量明显多于 5 的数量，因此只要统计有多少个 5 即可。
+         * 对于一个数 N，它所包含 5 的个数为：N/5 + N/5^2 + N/5^3 + ...，
+         * 其中 N/5 表示不大于 N 的数中 5 的倍数贡献一个 5，N/5^2 表示不大于 N 的数中 5^2 的倍数再贡献一个 5 ...。
+         */
+        return n == 0 ? 0 : n / 5 + trailingZeroes(n / 5);
+        /**
+         * 如果统计的是 N! 的二进制表示中最低位 1 的位置，只要统计有多少个 2 即可，
+         * 和求解有多少个 5 一样，2 的个数为 N/2 + N/2^2 + N/2^3 + ...
+         */
+    }
+
+    /**
+     * 字符串加法减法
+     * 1. 二进制求和
+     * 给你两个二进制字符串 a 和 b ，以二进制字符串的形式返回它们的和。
+     * 示例 1：
+     * 输入:a = "11", b = "1"
+     * 输出："100"
+     * 示例 2：
+     * 输入：a = "1010", b = "1011"
+     * 输出："10101"
+     */
+    public String addBinary(String a, String b) { // TODO: 2022/12/5
+        int i = a.length() - 1, j = b.length() - 1, carry = 0;
+        StringBuilder str = new StringBuilder();
+        while (carry == 1 || i >= 0 || j >= 0) {
+            if (i >= 0 && a.charAt(i--) == '1') {
+                carry++;
+            }
+            if (j >= 0 && b.charAt(j--) == '1') {
+                carry++;
+            }
+            str.append(carry % 2);
+            carry /= 2;
+        }
+        return str.reverse().toString();
+    }
+
+    /**
+     * 2. 字符串相加
+     * 给定两个字符串形式的非负整数 num1 和num2 ，计算它们的和并同样以字符串形式返回。
+     * 你不能使用任何內建的用于处理大整数的库（比如 BigInteger）， 也不能直接将输入的字符串转换为整数形式。
+     * 示例 1：
+     * 输入：num1 = "11", num2 = "123"
+     * 输出："134"
+     * 示例 2
+     * 输入：num1 = "456", num2 = "77"
+     * 输出："533"
+     * 示例 3：
+     * 输入：num1 = "0", num2 = "0"
+     * 输出："0"
+     */
+    public String addStrings(String num1, String num2) {  // TODO: 2022/12/5 这其实是对任意进制的通用方法，上面的二进制也能用
+        int i = num1.length() - 1, j = num2.length() - 1, carry = 0;
+        StringBuilder str = new StringBuilder();
+        while (carry == 1 || i >= 0 || j >= 0) {
+            int x = i < 0 ? 0 : num1.charAt(i--) - '0'; // 获得当前的数字，如果已经遍历完，就认为是0
+            int y = j < 0 ? 0 : num2.charAt(j--) - '0';
+            str.append((x + y + carry) % 10); // 当前数字相加，再加上进位，对10取余便是得数的个位
+            carry = (x + y + carry) / 10; // 获得 得数的进位
+        }
+        return str.reverse().toString();
+    }
+
+
 }
