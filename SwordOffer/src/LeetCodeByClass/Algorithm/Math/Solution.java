@@ -1,5 +1,7 @@
 package LeetCodeByClass.Algorithm.Math;
 
+import java.util.Arrays;
+
 public class Solution {
     /**
      * 使用数学
@@ -251,6 +253,246 @@ public class Solution {
             carry = (x + y + carry) / 10; // 获得 得数的进位
         }
         return str.reverse().toString();
+    }
+
+    /**
+     * 相遇问题
+     * 1. 最小操作次数使数组元素相等 II
+     * 给你一个长度为 n 的整数数组 nums ，返回使所有数组元素相等需要的最小操作数。
+     * 在一次操作中，你可以使数组中的一个元素加 1 或者减 1 。
+     * 示例 1：
+     * 输入：nums = [1,2,3]
+     * 输出：2
+     * 解释：
+     * 只需要两次操作（每次操作指南使一个元素加 1 或减 1）：
+     * [1,2,3]  =>  [2,2,3]  =>  [2,2,2]
+     * 示例 2：
+     * 输入：nums = [1,10,2,9]
+     * 输出：16
+     */
+    public int minMoves2(int[] nums) { // TODO: 2022/12/6
+        /**
+         * 设 m 为中位数。a 和 b 是 m 两边的两个元素，且 b > a。要使 a 和 b 相等，它们总共移动的次数为 b - a，
+         * 这个值等于 (b - m) + (m - a)，也就是把这两个数移动到中位数的移动次数。
+         */
+        Arrays.sort(nums);
+        int ans = 0;
+        int left = 0, right = nums.length - 1;
+        while (left <= right){
+            ans = ans + (nums[right--] - nums[left++]);
+        }
+        return ans;
+    }
+
+    /**
+     * 多数投票问题
+     * 1. 多数元素
+     * 给定一个大小为 n 的数组 nums ，返回其中的多数元素。多数元素是指在数组中出现次数 大于 ⌊ n/2 ⌋ 的元素。
+     * 你可以假设数组是非空的，并且给定的数组总是存在多数元素。
+     * 示例 1：
+     * 输入：nums = [3,2,3]
+     * 输出：3
+     * 示例 2：
+     * 输入：nums = [2,2,1,1,1,2,2]
+     * 输出：2
+     */
+    public int majorityElement(int[] nums) {
+        int win = nums[0];
+        int count = 1;
+        for (int i = 1; i < nums.length; i++) {
+            if (nums[i] == win){
+                count++;
+            }else {
+                count--;
+                if (count == 0){
+                    win = nums[i];
+                    count = 1;
+                }
+            }
+        }
+        return win;
+    }
+
+    /**
+     * 其他
+     * 1. 有效的完全平方数
+     * 给定一个 正整数 num ，编写一个函数，如果 num 是一个完全平方数，则返回 true ，否则返回 false 。
+     * 进阶：不要 使用任何内置的库函数，如  sqrt 。
+     * 示例 1：
+     * 输入：num = 16
+     * 输出：true
+     * 示例 2：
+     * 输入：num = 14
+     * 输出：false
+     */
+    public boolean isPerfectSquare(int num) {
+        long left = 1, right = num/2; // TODO: 2022/12/6 注意使用long，int在计算 mid*mid 时可能会越界
+        while(left < right){
+            long mid = left + (right-left)/2;
+
+            if (mid * mid > num) right = mid;
+            else if (mid * mid < num) left = mid + 1;
+            else return true;
+        }
+        return left * left == num;
+    }
+
+    /**
+     * 2. 3 的幂
+     * 给定一个整数，写一个函数来判断它是否是 3 的幂次方。如果是，返回 true ；否则，返回 false 。
+     * 整数 n 是 3 的幂次方需满足：存在整数 x 使得 n == 3^x
+     * 示例 1：
+     * 输入：n = 27
+     * 输出：true
+     * 示例 2：
+     * 输入：n = 0
+     * 输出：false
+     * 示例 3：
+     * 输入：n = 9
+     * 输出：true
+     * 示例 4：
+     * 输入：n = 45
+     * 输出：false
+     */
+    public boolean isPowerOfThree(int n) { // TODO: 2022/12/6
+        while (n != 0 && n % 3 == 0) {
+            n /= 3;
+        }
+        return n == 1;
+    }
+
+    /**
+     * 3. 除自身以外数组的乘积
+     * 给你一个整数数组 nums，返回 数组 answer ，其中 answer[i] 等于 nums 中除 nums[i] 之外其余各元素的乘积 。
+     * 题目数据 保证 数组 nums之中任意元素的全部前缀元素和后缀的乘积都在  32 位 整数范围内。
+     * 请不要使用除法，且在 O(n) 时间复杂度内完成此题。
+     * 示例 1:
+     * 输入: nums = [1,2,3,4]
+     * 输出: [24,12,8,6]
+     * 示例 2:
+     * 输入: nums = [-1,1,0,-3,3]
+     * 输出: [0,0,9,0,0]
+     */
+    public int[] productExceptSelf(int[] nums) { // TODO: 2022/12/6
+        /**
+         * 用数组, L[i] 存储nums[i]左侧所有元素的乘积, L[0]=1
+         * 用数组, R[i] 存储nums[i]右侧所有元素的乘积, R[nums.length - 1] = 1
+         * answer[i] = L[i] * R[i]
+         */
+        // 方法一
+        /*int len = nums.length;
+        int[] L = new int[len];
+        int[] R = new int[len];
+
+        L[0] = 1;
+        for (int i = 1; i < L.length; i++) {
+            L[i] = L[i-1] * nums[i-1];
+        }
+
+        R[len - 1] = 1;
+        for (int i = len - 2; i >= 0; i--) {
+            R[i] = R[i+1] * nums[i+1];
+        }
+
+        int[] ans = new int[len];
+        for (int i = 0; i < ans.length; i++) {
+            ans[i] = L[i] * R[i];
+        }
+        return ans;*/
+        // 方法二：使用ans数组作为 L 数组，动态构造 R 数组
+        int length = nums.length;
+        int[] answer = new int[length];
+
+        // answer[i] 表示索引 i 左侧所有元素的乘积
+        // 因为索引为 '0' 的元素左侧没有元素， 所以 answer[0] = 1
+        answer[0] = 1;
+        for (int i = 1; i < length; i++) {
+            answer[i] = nums[i - 1] * answer[i - 1];
+        }
+
+        // R 为右侧所有元素的乘积
+        // 刚开始右边没有元素，所以 R = 1
+        int R = 1;
+        for (int i = length - 1; i >= 0; i--) {
+            // 对于索引 i，左边的乘积为 answer[i]，右边的乘积为 R
+            answer[i] = answer[i] * R;
+            // R 需要包含右边所有的乘积，所以计算下一个结果时需要将当前值乘到 R 上
+            R *= nums[i];
+        }
+        return answer;
+    }
+
+    /**
+     * 4. 三个数的最大乘积
+     * 给你一个整型数组 nums ，在数组中找出由三个数组成的最大乘积，并输出这个乘积。
+     * 示例 1：
+     * 输入：nums = [1,2,3]
+     * 输出：6
+     * 示例 2：
+     * 输入：nums = [1,2,3,4]
+     * 输出：24
+     * 示例 3：
+     * 输入：nums = [-1,-2,-3]
+     * 输出：-6
+     */
+    /*int max = Integer.MIN_VALUE;
+    public int maximumProduct(int[] nums) {
+        List<Integer> sub = new ArrayList<>();
+        backTracing(sub, nums, 0);
+        return max;
+    }
+    private void backTracing(List<Integer> sub, int[] nums, int start) {
+        if (sub.size() == 3){
+            int sum = 1;
+            for (Integer data : sub) {
+                sum *= data;
+            }
+            max = Math.max(max, sum);
+            return;
+        }
+        for (int i = start; i < nums.length; i++) {
+            sub.add(nums[i]);
+            backTracing(sub, nums, i+1);
+            sub.remove(sub.size() - 1);
+        }
+    }*/ // 回溯，超出时间限制
+    public int maximumProduct(int[] nums) { // TODO: 2022/12/6
+        //  方法一 ：排序
+        // 如果全是非负数或非正数，升序排列后，三个数的最大乘积就是最后三个数的乘积
+        // 如果正数负数都有，三个数的最大乘积
+        //  1. 三个最大正数的乘积
+        //  2. 两个最小负数和一个最大正数的乘积
+        /*Arrays.sort(nums);
+        int len = nums.length;
+        return Math.max(nums[len-1]*nums[len-2]*nums[len-3], nums[0]*nums[1]*nums[len-1]);*/
+        // 方法二：线性扫描
+        // 在方法一中，我们实际上只要求出数组中 最大的三个数 以及 最小的两个数，因此我们可以不用排序，用线性扫描直接得出这五个数。
+        // 最小的和第二小的
+        int min1 = Integer.MAX_VALUE, min2 = Integer.MAX_VALUE;
+        // 最大的、第二大的和第三大的
+        int max1 = Integer.MIN_VALUE, max2 = Integer.MIN_VALUE, max3 = Integer.MIN_VALUE;
+
+        for (int x : nums) {
+            if (x < min1) { // 当前的数比最小的数还小，那当前的数应该是最小的数，之前的最小的数应该是第二小的
+                min2 = min1;
+                min1 = x;
+            } else if (x < min2) { // 当前的数比最第二小的数小，那当前的数应该是第二小的
+                min2 = x;
+            }
+
+            if (x > max1) { // 当前的数比最大的数还大，那当前的数应该是最大的数，之前的最大的数应该是第二大的，之前第二大的应该是第三大的
+                max3 = max2;
+                max2 = max1;
+                max1 = x;
+            } else if (x > max2) { // 当前的数比最第二大的数大，那当前的数应该是第二大的
+                max3 = max2;
+                max2 = x;
+            } else if (x > max3) { // 当前的数比最第三大的数大，那当前的数应该是第三大的
+                max3 = x;
+            }
+        }
+
+        return Math.max(min1 * min2 * max1, max1 * max2 * max3);
     }
 
 

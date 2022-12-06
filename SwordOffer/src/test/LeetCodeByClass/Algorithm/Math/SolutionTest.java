@@ -67,4 +67,19 @@ public void testTrailingZeroes(){
     System.out.println(s.trailingZeroes(3));
 }
 
+@Test
+public void testMajorityElement(){
+    System.out.println(s.majorityElement(new int[]{8,8,7,7,7}));
+}
+
+@Test
+public void testIsPerfectSquare(){
+    System.out.println(s.isPerfectSquare(808201));
+}
+
+@Test
+public void testMaximumProduct(){
+    System.out.println(s.maximumProduct(new int[]{-1, -2, -3}));
+}
+
 } 
