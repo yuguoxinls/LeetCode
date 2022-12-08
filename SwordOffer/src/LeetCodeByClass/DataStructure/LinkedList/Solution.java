@@ -1,5 +1,10 @@
 package LeetCodeByClass.DataStructure.LinkedList;
 
+import java.util.ArrayList;
+import java.util.Deque;
+import java.util.LinkedList;
+import java.util.List;
+
 public class Solution {
     /**
      * 1. 相交链表
@@ -146,6 +151,103 @@ public class Solution {
 
         slow.next = slow.next.next;
         return dummy.next;
+    }
+
+    /**
+     * 6. 两两交换链表中的节点
+     * 给你一个链表，两两交换其中相邻的节点，并返回交换后链表的头节点。你必须在不修改节点内部的值的情况下完成本题（即，只能进行节点交换）。
+     * 示例 1：
+     * 输入：head = [1,2,3,4]
+     * 输出：[2,1,4,3]
+     * 示例 2：
+     * 输入：head = []
+     * 输出：[]
+     * 示例 3：
+     * 输入：head = [1]
+     * 输出：[1]
+     */
+    public ListNode swapPairs(ListNode head) {
+        if (head== null || head.next == null) return head;
+        ListNode fast = head.next, slow = head, dummy = new ListNode(), tmp = dummy;
+
+        while (true) {
+            tmp.next = new ListNode(fast.val);
+            tmp = tmp.next;
+            tmp.next = new ListNode(slow.val);
+            tmp = tmp.next;
+            if (fast.next == null) break;
+            if (fast.next.next == null) {
+                tmp.next = new ListNode(fast.next.val);
+                break;
+            }
+            fast = fast.next.next;
+            slow = slow.next.next;
+        }
+        return dummy.next;
+    }
+
+    /**
+     * 7. 两数相加 II
+     * 给你两个 非空 链表来代表两个非负整数。数字最高位位于链表开始位置。它们的每个节点只存储一位数字。将这两数相加会返回一个新的链表。
+     * 你可以假设除了数字 0 之外，这两个数字都不会以零开头。
+     * 示例1：
+     * 输入：l1 = [7,2,4,3], l2 = [5,6,4]
+     * 输出：[7,8,0,7]
+     * 示例2：
+     * 输入：l1 = [2,4,3], l2 = [5,6,4]
+     * 输出：[8,0,7]
+     * 示例3：
+     * 输入：l1 = [0], l2 = [0]
+     * 输出：[0]
+     */
+    public ListNode addTwoNumbers(ListNode l1, ListNode l2) { // TODO: 2022/12/8 肯定要用栈，重点在如何处理进位
+        if (l1 == null) return l2;
+        if (l2 == null) return l1;
+
+        Deque<Integer> stack1 = buildStack(l1);
+        Deque<Integer> stack2 = buildStack(l2);
+        ListNode dummy = new ListNode();
+        int carry = 0;
+        while(!stack1.isEmpty() || !stack2.isEmpty() || carry != 0){ // 只要还有数没加完，就继续加，不管是来自原来两个链表的数，还是进位
+            int x = stack1.isEmpty() ? 0 : stack1.pop(); // 查看当前栈还有数没加吗，有的话取这个数，没有的话就取0
+            int y = stack2.isEmpty() ? 0 : stack2.pop();
+            int sum = x + y + carry; // 计算 2 个数的和，包括之前的进位
+            ListNode tmpNode = new ListNode(sum%10); // sum%10能够得到和的个位
+            tmpNode.next = dummy.next; // 这两步操作很关键，每次把计算得到的结果节点都插到哑节点的后面，这样就不用最后再把链表翻转一次了
+            dummy.next = tmpNode;
+            carry = sum/10; // sum/10能够得到和的进位
+        }
+        return dummy.next;
+    }
+    private Deque<Integer> buildStack(ListNode head) {
+        Deque<Integer> ans = new LinkedList<>();
+        ListNode tmp = head;
+        while (tmp != null){
+            ans.push(tmp.val);
+            tmp = tmp.next;
+        }
+        return ans;
+    }
+
+    /**
+     * 8. 回文链表
+     * 给你一个单链表的头节点 head ，请你判断该链表是否为回文链表。如果是，返回 true ；否则，返回 false 。
+     */
+    public boolean isPalindrome(ListNode head) {
+        if (head==null) return true;
+        List<Integer> val = new ArrayList<>();
+        ListNode tmp = head;
+        while (tmp != null){
+            val.add(tmp.val);
+            tmp= tmp.next;
+        }
+        int left = 0, right = val.size() - 1;
+        while (left < right){
+            if (val.get(left) != val.get(right)) return false;
+            left++;
+            right--;
+        }
+        return true;
     }
 
 }
