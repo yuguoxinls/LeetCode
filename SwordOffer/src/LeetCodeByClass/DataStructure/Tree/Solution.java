@@ -1,7 +1,9 @@
 package LeetCodeByClass.DataStructure.Tree;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
+import java.util.Queue;
 
 public class Solution {
     /**
@@ -238,4 +240,100 @@ public class Solution {
 
         return ret;
     }
+
+    /**
+     * 8. 另一棵树的子树
+     * 给你两棵二叉树 root 和 subRoot 。检验 root 中是否包含和 subRoot 具有相同结构和节点值的子树。如果存在，返回 true ；否则，返回 false 。
+     * 二叉树 tree 的一棵子树包括 tree 的某个节点和这个节点的所有后代节点。tree 也可以看做它自身的一棵子树。
+     */
+    public boolean isSubtree(TreeNode root, TreeNode subRoot) { // TODO: 2022/12/15
+        if (root == null) return false;
+        return isSubtreeWithRoot(root, subRoot) || isSubtree(root.left, subRoot) || isSubtree(root.right, subRoot);
+    }
+
+    private boolean isSubtreeWithRoot(TreeNode root, TreeNode subRoot) {
+        if (root == null && subRoot == null) return true;
+        if (root == null || subRoot == null) return false;
+        if (root.val != subRoot.val) return false;
+        return isSubtreeWithRoot(root.left, subRoot.left) && isSubtreeWithRoot(root.right, subRoot.right);
+    }
+
+    /**
+     * 9. 对称二叉树
+     * 给你一个二叉树的根节点 root ， 检查它是否轴对称。
+     */
+    public boolean isSymmetric(TreeNode root) { // TODO: 2022/12/15 转换成判断两棵树是否对称
+        if (root == null) return true;
+        return check(root.left, root.right);
+    }
+    private boolean check(TreeNode left, TreeNode right) {
+        if (left == null && right == null) return true;
+        if (left == null || right == null) return false;
+        if (left.val != right.val) return false;
+        return check(left.left, right.right) && check(left.right, right.left);
+    }
+
+    /**
+     * 10. 二叉树的最小深度
+     * 给定一个二叉树，找出其最小深度。
+     * 最小深度是从根节点到最近叶子节点的最短路径上的节点数量。
+     */
+    public int minDepth(TreeNode root) { // TODO: 2022/12/15 注意排除树退化成单链表的情况
+        if (root == null) return 0;
+        /*int left = minDepth(root.left);
+        int right = minDepth(root.right);
+        if (left == 0 || right == 0) return left + right + 1;
+        return Math.min(left, right) + 1;*/
+        // TODO: 2022/12/15 自己写的广度优先遍历居然更快
+        int minDep = 1;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode treeNode = queue.poll();
+                if (treeNode.left != null) queue.offer(treeNode.left);
+                if (treeNode.right != null) queue.offer(treeNode.right);
+                if (treeNode.left == null && treeNode.right == null) return minDep;
+            }
+            minDep++;
+        }
+        return minDep;
+    }
+
+    /**
+     * 11. 左叶子之和
+     * 给定二叉树的根节点 root ，返回所有左叶子之和。
+     */
+    public int sumOfLeftLeaves(TreeNode root) {
+        /*if (root == null || (root.left == null && root.right == null)) return 0;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        int sum = 0;
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode treeNode = queue.poll();
+                if (treeNode.left != null) {
+                    queue.offer(treeNode.left);
+                    if (treeNode.left.left == null && treeNode.left.right == null) sum += treeNode.left.val; // 注意这里只计算左叶子节点，不是所有的左节点都算在内
+                }
+                if (treeNode.right != null) queue.offer(treeNode.right);
+            }
+        }
+        return sum;*/
+        // TODO: 2022/12/15 递归的思路更直观
+        if (root == null) return 0;
+        if (isLeaf(root.left)) { // 如果根节点的左子树就是左叶子节点，直接返回它的值+右子树中的左叶子节点
+            return root.left.val + sumOfLeftLeaves(root.right);
+        }
+        // 如果左子树不是左叶子节点
+        return sumOfLeftLeaves(root.left) + sumOfLeftLeaves(root.right);
+    }
+
+    private boolean isLeaf(TreeNode node) {
+        if (node == null) return false;
+        return node.left == null && node.right == null;
+    }
+
 }
