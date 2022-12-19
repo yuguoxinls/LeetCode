@@ -1,9 +1,6 @@
 package LeetCodeByClass.DataStructure.Tree;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.Map;
-import java.util.Queue;
+import java.util.*;
 
 public class Solution {
     /**
@@ -330,10 +327,151 @@ public class Solution {
         // 如果左子树不是左叶子节点
         return sumOfLeftLeaves(root.left) + sumOfLeftLeaves(root.right);
     }
-
     private boolean isLeaf(TreeNode node) {
         if (node == null) return false;
         return node.left == null && node.right == null;
+    }
+
+    /**
+     * 12. 最长同值路径
+     * 给定一个二叉树的 root ，返回 最长的路径的长度 ，这个路径中的 每个节点具有相同值 。 这条路径可以经过也可以不经过根节点。
+     * 两个节点之间的路径长度 由它们之间的边数表示。
+     * 示例 1:
+     * 输入：root = [5,4,5,1,1,5]
+     * 输出：2
+     * 示例 2:
+     * 输入：root = [1,4,5,4,4,5]
+     * 输出：2
+     */
+    // 最长同值长度，最后肯定是 '∧' 型长度 ， 用 max 记录
+    int maxVal = 0;
+    public int longestUnivaluePath(TreeNode root) { // TODO: 2022/12/19 看不懂哦
+        dfs(root);
+        return maxVal;
+    }
+
+    // 返回以当前 root节点 为根节点出发的 最长'/'型 或 '\' 同值长度
+    public int dfs(TreeNode root){
+        if(root == null)
+            return 0;
+        // 得到左子树的最长'/'型 或 '\' 同值长度
+        int maxLeft = dfs(root.left);
+        // 得到右子树的最长'/'型 或 '\' 同值长度
+        int maxRight = dfs(root.right);
+
+        // 现在是左子树有 一条 '/' 型路径，右子树有一条 '\' 型路径，我们要判断这个'/' + '\' 能不能连通当前根节点 形成最长 '∧' 型同值路径
+        int curLeft = 0,curRight = 0;
+
+        // 若根节点和左根值相同，那么 根节点 到 左根之间 形成通路，根节点的 左最大同值分支 '/' 可以加上根节点 形成 长度+1 的 '/'
+        // 否则只是表示 从 当前根节点 的 左根节点出发 有路径，但是和当前根节点连接断开，故当前根节点的 左出发同值路径，'/' 为0
+        if(root.left!=null && root.left.val==root.val)
+            curLeft = maxLeft + 1;
+
+        // 若根节点和右根值相同，那么 根节点 到 右根之间 形成通路，根节点的 右最大同值分支 '\' 可以加上根节点 形成 长度+1 的'\'
+        // 否则只是表示 从 当前根节点 的 右根节点出发 有路径，但是和当前根节点连接断开，故当前根节点的 右出发同值路径，'\' 为0
+        if(root.right!=null && root.right.val==root.val)
+            curRight = maxRight + 1;
+
+        // 连接根节点的新的 '/' 和'\' 再形成 新的大 '∧'，从而让 max 记录下了 整颗树中 任意节点能形成的 最大 '∧' 同值路径长度，也是题目要求的
+        maxVal = Math.max(maxVal,curLeft+curRight);
+
+        // 返回 左 '/'或 右'\'中分支的长度 最长的 一支长度(若根节点和左右子树都断开，那么显然返回的是 0 ，但递归时max已经记录下了最长'∧'的长度)
+        return Math.max(curLeft, curRight);
+    }
+
+    /**
+     * 13. 打家劫舍 III
+     * 小偷又发现了一个新的可行窃的地区。这个地区只有一个入口，我们称之为 root 。
+     * 除了 root 之外，每栋房子有且只有一个“父“房子与之相连。一番侦察之后，聪明的小偷意识到“这个地方的所有房屋的排列类似于一棵二叉树”。
+     * 如果 两个直接相连的房子在同一天晚上被打劫 ，房屋将自动报警。
+     * 给定二叉树的 root 。返回 在不触动警报的情况下 ，小偷能够盗取的最高金额 。
+     * 示例 1:
+     * 输入: root = [3,2,3,null,3,null,1]
+     * 输出: 7
+     * 解释: 小偷一晚能够盗取的最高金额 3 + 3 + 1 = 7
+     * 示例 2:
+     * 输入: root = [3,4,5,1,3,null,1]
+     * 输出: 9
+     * 解释: 小偷一晚能够盗取的最高金额 4 + 5 = 9
+     */
+    Map<TreeNode, Integer> f = new HashMap<TreeNode, Integer>();
+    Map<TreeNode, Integer> g = new HashMap<TreeNode, Integer>();
+    public int rob(TreeNode root) { // TODO: 2022/12/19 动态规划
+        /**
+         * 简化一下这个问题：一棵二叉树，树上的每个点都有对应的权值，每个点有两种状态（选中和不选中），问在不能同时选中有父子关系的点的情况下，能选中的点的最大权值和是多少。
+         * 我们可以用 f(o) 表示选择 o 节点的情况下，o 节点的子树上被选择的节点的最大权值和；
+         * g(o) 表示不选择 o 节点的情况下，o 节点的子树上被选择的节点的最大权值和；l 和 r 代表 o 的左右孩子。
+         *  当 o 被选中时，o 的左右孩子都不能被选中，故 o 被选中情况下子树上被选中点的最大权值和为 l 和 r 不被选中的最大权值和相加，即 f(o)=g(l)+g(r)
+         *  当 o 不被选中时，o 的左右孩子可以被选中，也可以不被选中。对于 o 的某个具体的孩子 x，它对 o 的贡献是 x 被选中和不被选中情况下权值和的较大值。故 g(o)=max{f(l),g(l)}+max{f(r),g(r)}
+         * 至此，我们可以用哈希表来存 f 和 g 的函数值，用深度优先搜索的办法后序遍历这棵二叉树，我们就可以得到每一个节点的 f 和 g。根节点的 f 和 g 的最大值就是我们要找的答案。
+         */
+        dfsV2(root);
+        return Math.max(f.getOrDefault(root, 0), g.getOrDefault(root, 0));
+    }
+
+    private void dfsV2(TreeNode node) {
+        if (node == null) {
+            return;
+        }
+        dfsV2(node.left);
+        dfsV2(node.right);
+        f.put(node, node.val + g.getOrDefault(node.left, 0) + g.getOrDefault(node.right, 0)); // f(o)=g(l)+g(r)
+        g.put(node, Math.max(f.getOrDefault(node.left, 0), g.getOrDefault(node.left, 0)) + Math.max(f.getOrDefault(node.right, 0), g.getOrDefault(node.right, 0)));
+    }
+
+    /**
+     * 14. 二叉树中第二小的节点
+     * 给定一个非空特殊的二叉树，每个节点都是正数，并且每个节点的子节点数量只能为 2 或 0。如果一个节点有两个子节点的话，那么该节点的值等于两个子节点中较小的一个。
+     * 更正式地说，即 root.val = min(root.left.val, root.right.val) 总成立。
+     * 给出这样的一个二叉树，你需要输出所有节点中的 第二小的值 。
+     * 如果第二小的值不存在的话，输出 -1 。
+     * 示例 1：
+     * 输入：root = [2,2,5,null,null,5,7]
+     * 输出：5
+     * 解释：最小的值是 2 ，第二小的值是 5 。
+     * 示例 2：
+     * 输入：root = [2,2,2]
+     * 输出：-1
+     * 解释：最小的值是 2, 但是不存在第二小的值。
+     */
+    public int findSecondMinimumValue(TreeNode root) {
+        /*if (root == null) return -1;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        List<Integer> list = new ArrayList<>();
+        list.add(root.val);
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                int val = node.val;
+                if (!list.contains(val)) list.add(val);
+                if (node.left != null) {
+                    queue.offer(node.left);
+                    queue.offer(node.right);
+                }
+            }
+        }
+        list.sort((o1, o2) -> (o1-o2));
+        if (list.size() == 1) return -1;
+        return list.get(1);*/ // 自己写的BFS，太慢
+        // TODO: 2022/12/19 利用改题目中树的特性
+        if (root == null) return -1;
+        if (root.left == null && root.right == null) return -1; // 返回 -1，说明没有最小值
+        int leftVal = root.left.val;
+        int rightVal = root.right.val;
+        // 根节点是最小值，从等于根节点的某一个子树中找到最小值，就是第二小值
+        if (leftVal == root.val) {
+            leftVal = findSecondMinimumValue(root.left);
+        }
+        if (rightVal == root.val) {
+            rightVal = findSecondMinimumValue(root.right);
+        }
+        // 如果是 -1，说明左右子树没有最小值，也就没有第二小值
+        if (leftVal == -1) return rightVal;
+        if (rightVal == -1) return leftVal;
+        // 如果都不是 -1，返回左右子树最小值的最小值
+        return Math.min(leftVal, rightVal);
     }
 
 }
