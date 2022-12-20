@@ -474,4 +474,223 @@ public class Solution {
         return Math.min(leftVal, rightVal);
     }
 
+    /**
+     * 层次遍历：BFS
+     * 1. 二叉树的层平均值
+     * 给定一个非空二叉树的根节点 root , 以数组的形式返回每一层节点的平均值。与实际答案相差 10-5 以内的答案可以被接受。
+     * 示例 1：
+     * 输入：root = [3,9,20,null,null,15,7]
+     * 输出：[3.00000,14.50000,11.00000]
+     * 解释：第 0 层的平均值为 3,第 1 层的平均值为 14.5,第 2 层的平均值为 11 。
+     * 因此返回 [3, 14.5, 11] 。
+     * 示例 2:
+     * 输入：root = [3,9,20,15,7]
+     * 输出：[3.00000,14.50000,11.00000]
+     */
+    public List<Double> averageOfLevels(TreeNode root) {
+        List<Double> ans = new ArrayList<>();
+        if (root == null) return ans;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            double sum = 0;
+            for (int i = 0; i < size; i++) {
+                TreeNode treeNode = queue.poll();
+                int val = treeNode.val;
+                sum += val;
+                if (treeNode.left != null) queue.offer(treeNode.left);
+                if (treeNode.right != null) queue.offer(treeNode.right);
+            }
+            ans.add(sum/size);
+        }
+        return ans;
+    }
+
+    /**
+     * 2. 找树左下角的值
+     * 给定一个二叉树的 根节点 root，请找出该二叉树的 最底层 最左边 节点的值。
+     * 假设二叉树中至少有一个节点。
+     * 示例 1:
+     * 输入: root = [2,1,3]
+     * 输出: 1
+     * 示例 2:
+     * 输入: [1,2,3,4,null,5,6,null,null,7]
+     * 输出: 7
+     */
+    public int findBottomLeftValue(TreeNode root) {
+        /*Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        List<Integer> tmp = new ArrayList<>();
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            tmp = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode treeNode = queue.poll();
+                tmp.add(treeNode.val);
+                if (treeNode.left != null) queue.offer(treeNode.left);
+                if (treeNode.right != null) queue.offer(treeNode.right);
+            }
+        }
+        return tmp.get(0);*/
+        // TODO: 2022/12/20 先添加右节点，再添加左节点，这样就可以做到从右到左遍历每一层的节点，这样结束的时候就停在了最后一层的最左侧节点处
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.add(root);
+        while (!queue.isEmpty()) {
+            root = queue.poll();
+            if (root.right != null) queue.add(root.right);
+            if (root.left != null) queue.add(root.left);
+        }
+        return root.val;
+    }
+
+    /**
+     * 前中后序遍历：层次遍历使用 BFS 实现，利用的就是 BFS 一层一层遍历的特性；而前序、中序、后序遍历利用了 DFS 实现。
+     * 1. 二叉树的前序遍历
+     * 给你二叉树的根节点 root ，返回它节点值的 前序 遍历。
+     * 示例 1：
+     * 输入：root = [1,null,2,3]
+     * 输出：[1,2,3]
+     * 示例 2：
+     * 输入：root = []
+     * 输出：[]
+     * 示例 3：
+     * 输入：root = [1]
+     * 输出：[1]
+     * 示例 4：
+     * 输入：root = [1,2]
+     * 输出：[1,2]
+     * 示例 5：
+     * 输入：root = [1,null,2]
+     * 输出：[1,2]
+     */
+    List<Integer> preAns = new ArrayList<>();
+    public List<Integer> preorderTraversal(TreeNode root) {
+        /*if (root == null) return preAns;
+        preAns.add(root.val);
+        preorderTraversal(root.left);
+        preorderTraversal(root.right);
+        return preAns;*/
+        // TODO: 2022/12/20 非递归方式实现
+        List<Integer> ret = new ArrayList<>();
+        Deque<TreeNode> stack = new LinkedList<>(); // 更推荐使用 Deque，而不是 Stack 来表示栈
+        stack.push(root);
+        while (!stack.isEmpty()) {
+            TreeNode node = stack.pop();
+            if (node == null) continue;
+            ret.add(node.val);
+            stack.push(node.right);  // 因为是栈，所以先右后左，出栈的时候就能够保证左子树先遍历
+            stack.push(node.left);
+        }
+        return ret;
+    }
+
+    /**
+     * 2. 二叉树的后序遍历
+     * 给你一棵二叉树的根节点 root ，返回其节点值的 后序遍历 。
+     */
+    List<Integer> postAns = new ArrayList<>();
+    public List<Integer> postorderTraversal(TreeNode root) {
+        /*if (root == null) return postAns;
+        postorderTraversal(root.left);
+        postorderTraversal(root.right);
+        postAns.add(root.val);
+        return postAns;*/
+        // TODO: 2022/12/20 非递归实现
+        // 前序遍历为 root -> left -> right，后序遍历为 left -> right -> root。
+        // 可以修改前序遍历成为 root -> right -> left，那么这个顺序就和后序遍历正好相反，最后返回结果的时候，直接取反就是正确答案
+        List<Integer> ret = new ArrayList<>();
+        Deque<TreeNode> stack = new LinkedList<>();
+        stack.push(root);
+        while (!stack.isEmpty()){
+            TreeNode node = stack.pop();
+            if (node == null) continue;
+            ret.add(node.val);
+            stack.push(node.left);
+            stack.push(node.right);
+        }
+        Collections.reverse(ret);
+        return ret;
+    }
+
+    /**
+     * 3. 二叉树的中序遍历
+     * 给定一个二叉树的根节点 root ，返回 它的 中序 遍历 。
+     */
+    List<Integer> inorderAns = new ArrayList<>();
+    public List<Integer> inorderTraversal(TreeNode root) {
+        /*if (root == null) return inorderAns;
+        inorderTraversal(root.left);
+        inorderAns.add(root.val);
+        inorderTraversal(root.right);
+        return inorderAns;*/
+        // TODO: 2022/12/20 非递归实现
+        List<Integer> res = new ArrayList<>();
+        if (root == null) return res;
+        Deque<TreeNode> stack = new LinkedList<>();
+        TreeNode cur = root;
+        while (cur != null || !stack.isEmpty()) {
+            while (cur != null) { // 沿着最左路走，并把路过的节点都压入栈，退出循环的时候栈中存了最左路的所有节点
+                stack.push(cur);
+                cur = cur.left;
+            }
+            TreeNode node = stack.pop(); // 拿到最左路的节点
+            res.add(node.val);
+            cur = node.right;
+        }
+        return res;
+    }
+
+    /**
+     * 二叉查找树BST：根节点大于等于左子树所有节点，小于等于右子树所有节点 ——> 二叉查找树中序遍历有序
+     * 1. 修剪二叉搜索树
+     * 给你二叉搜索树的根节点 root ，同时给定最小边界low 和最大边界 high。通过修剪二叉搜索树，使得所有节点的值在[low, high]中。
+     * 修剪树 不应该 改变保留在树中的元素的相对结构 (即，如果没有被移除，原有的父代子代关系都应当保留)。 可以证明，存在 唯一的答案 。
+     * 所以结果应当返回修剪好的二叉搜索树的新的根节点。注意，根节点可能会根据给定的边界发生改变。
+     * 示例 1：
+     * 输入：root = [1,0,2], low = 1, high = 2
+     * 输出：[1,null,2]
+     * 示例 2：
+     * 输入：root = [3,0,4,null,2,null,null,1], low = 1, high = 3
+     * 输出：[3,2,null,1]
+     */
+    public TreeNode trimBST(TreeNode root, int low, int high) { // TODO: 2022/12/20
+        if (root == null) return null;
+        if (root.val > high) return trimBST(root.left, low, high);
+        if (root.val < low) return trimBST(root.right, low, high);
+        root.left = trimBST(root.left, low, high);
+        root.right = trimBST(root.right, low, high);
+        return root;
+    }
+
+    /**
+     * 2. 二叉搜索树中第K小的元素
+     * 给定一个二叉搜索树的根节点 root ，和一个整数 k ，请你设计一个算法查找其中第 k 个最小元素（从 1 开始计数）。
+     */
+    private int cnt = 0, val;
+    public int kthSmallest(TreeNode root, int k) { // TODO: 2022/12/20 k 之后的遍历都是多余的
+        // 中序遍历解法
+        inorder(root, k);
+        return val;
+        // 递归解法
+        /*int leftCnt = count(root.left);
+        if (leftCnt == k - 1) return root.val;
+        if (leftCnt > k - 1) return kthSmallest(root.left, k);
+        return kthSmallest(root.right, k - 1 - leftCnt);*/
+    }
+    private int count(TreeNode root) { // count该函数能计算以 root 为根节点的树中节点的数量
+        if (root == null) return 0;
+        return 1 + count(root.left) + count(root.right);
+    }
+    private void inorder(TreeNode root, int k) {
+        if (root == null) return;
+        inorder(root.left, k);
+        cnt++;
+        if (cnt == k){
+            val = root.val;
+            return;
+        }
+        inorder(root.right, k);
+    }
+
 }
