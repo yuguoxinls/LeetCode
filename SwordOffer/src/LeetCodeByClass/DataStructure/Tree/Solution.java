@@ -693,4 +693,148 @@ public class Solution {
         inorder(root.right, k);
     }
 
+    /**
+     * 3. 把二叉搜索树转换为累加树
+     * 给出二叉 搜索 树的根节点，该树的节点值各不相同，请你将其转换为累加树（Greater Sum Tree），使每个节点 node 的新值等于原树中大于或等于 node.val 的值之和。
+     * 提醒一下，二叉搜索树满足下列约束条件：
+     * 节点的左子树仅包含键 小于 节点键的节点。
+     * 节点的右子树仅包含键 大于 节点键的节点。
+     * 左右子树也必须是二叉搜索树。
+     * 示例 1：
+     * 输入：[4,1,6,0,2,5,7,null,null,null,3,null,null,null,8]
+     * 输出：[30,36,21,36,35,26,15,null,null,null,33,null,null,null,8]
+     * 示例 2：
+     * 输入：root = [0,null,1]
+     * 输出：[1,null,1]
+     * 示例 3：
+     * 输入：root = [1,0,2]
+     * 输出：[3,3,2]
+     * 示例 4：
+     * 输入：root = [3,2,4,1]
+     * 输出：[7,9,4,10]
+     */
+    private int sum = 0;
+    public TreeNode convertBST(TreeNode root) { // TODO: 2022/12/21
+        traver(root);
+        return root;
+    }
+    private void traver(TreeNode node) {
+        if (node == null) return;
+        traver(node.right);
+        sum += node.val;
+        node.val = sum;
+        traver(node.left);
+    }
+
+    /**
+     * 4. 二叉搜索树的最近公共祖先
+     * 给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+     * 百度百科中最近公共祖先的定义为：“对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+     * 示例 1:
+     * 输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8
+     * 输出: 6
+     * 解释: 节点 2 和节点 8 的最近公共祖先是 6。
+     * 示例 2:
+     * 输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4
+     * 输出: 2
+     * 解释: 节点 2 和节点 4 的最近公共祖先是 2, 因为根据定义最近公共祖先节点可以为节点本身。
+     */
+    public TreeNode lowestCommonAncestorBST(TreeNode root, TreeNode p, TreeNode q) {
+        if (p.val > root.val && q.val > root.val) return lowestCommonAncestorBST(root.right, p, q);
+        if (p.val < root.val && q.val < root.val) return lowestCommonAncestorBST(root.left, p, q);
+        return root;
+    }
+
+    /**
+     * 5. 二叉树的最近公共祖先
+     * 给定一个二叉树, 找到该树中两个指定节点的最近公共祖先
+     * 注意，和上题不同处在于 本题是普通的二叉树，没有值的大小关系
+     */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) { // TODO: 2022/12/21
+        if (root == null || p.val == root.val || q.val == root.val) return root;
+        TreeNode left = lowestCommonAncestor(root.left, p, q);
+        TreeNode right = lowestCommonAncestor(root.right, p, q);
+        if (left == null) return right;
+        if (right == null) return left;
+        return root;
+    }
+
+    /**
+     * 6. 将有序数组转换为二叉搜索树
+     * 给你一个整数数组 nums ，其中元素已经按 升序 排列，请你将其转换为一棵 高度平衡 二叉搜索树。
+     * 高度平衡 二叉树是一棵满足「每个节点的左右两个子树的高度差的绝对值不超过 1 」的二叉树。
+     * 示例 1：
+     * 输入：nums = [-10,-3,0,5,9]
+     * 输出：[0,-3,9,-10,null,5]
+     * 解释：[0,-10,5,null,-3,null,9] 也将被视为正确答案：
+     * 示例 2：
+     * 输入：nums = [1,3]
+     * 输出：[3,1]
+     * 解释：[1,null,3] 和 [3,1] 都是高度平衡二叉搜索树。
+     */
+    public TreeNode sortedArrayToBST(int[] nums) { // TODO: 2022/12/21
+        return toBST(nums, 0, nums.length - 1);
+    }
+    private TreeNode toBST(int[] nums, int sIdx, int eIdx) {
+        if (sIdx > eIdx) return null;
+        int mIdx = (sIdx + eIdx) / 2;
+        TreeNode root = new TreeNode(nums[mIdx]);
+        root.left =  toBST(nums, sIdx, mIdx - 1);
+        root.right = toBST(nums, mIdx + 1, eIdx);
+        return root;
+    }
+
+    /**
+     * 7. 有序链表转换二叉搜索树
+     * 给定一个单链表的头节点  head ，其中的元素 按升序排序 ，将其转换为高度平衡的二叉搜索树。
+     * 本题中，一个高度平衡二叉树是指一个二叉树每个节点 的左右两个子树的高度差不超过 1。
+     * 示例 1:
+     * 输入: head = [-10,-3,0,5,9]
+     * 输出: [0,-3,9,-10,null,5]
+     * 解释: 一个可能的答案是[0，-3,9，-10,null,5]，它表示所示的高度平衡的二叉搜索树。
+     * 示例 2:
+     * 输入: head = []
+     * 输出: []
+     */
+    public TreeNode sortedListToBST(ListNode head) {
+        /*if (head == null) return null;
+        List<Integer> val = new ArrayList<>();
+        while (head != null){
+            val.add(head.val);
+            head = head.next;
+        }
+        return toBST(val, 0, val.size() - 1);*/ // 套用了上题的数组解法，没有利用到链表的特性
+        // TODO: 2022/12/21
+        if (head == null) return null;
+        if (head.next == null) return new TreeNode(head.val);
+
+        ListNode preMid = preMid(head); // 得到中点的前一个结点
+        ListNode mid = preMid.next; // 得到中点
+
+        preMid.next = null;  // 断开链表
+
+        TreeNode root = new TreeNode(mid.val);
+        root.left = sortedListToBST(head);
+        root.right = sortedListToBST(mid.next);
+        return root;
+    }
+    private ListNode preMid(ListNode head) { // 得到链表中点的前一个节点
+        ListNode slow = head, fast = head.next;
+        ListNode pre = head;
+        while (fast != null && fast.next != null) {
+            pre = slow;
+            slow = slow.next;
+            fast = fast.next.next;
+        }
+        return pre;
+    }
+    private TreeNode toBST(List<Integer> nums, int sIdx, int eIdx) {
+        if (sIdx > eIdx) return null;
+        int mIdx = (sIdx + eIdx) / 2;
+        TreeNode root = new TreeNode(nums.get(mIdx));
+        root.left =  toBST(nums, sIdx, mIdx - 1);
+        root.right = toBST(nums, mIdx + 1, eIdx);
+        return root;
+    }
+
 }
