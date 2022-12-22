@@ -837,4 +837,160 @@ public class Solution {
         return root;
     }
 
+    /**
+     * 8. 两数之和 IV - 输入二叉搜索树
+     * 给定一个二叉搜索树 root 和一个目标结果 k，如果二叉搜索树中存在两个元素且它们的和等于给定的目标结果，则返回 true。
+     * 示例 1：
+     * 输入: root = [5,3,6,2,4,null,7], k = 9
+     * 输出: true
+     * 示例 2：
+     * 输入: root = [5,3,6,2,4,null,7], k = 28
+     * 输出: false
+     */
+    List<Integer> res = new ArrayList<>();
+    public boolean findTarget(TreeNode root, int k) {
+        if (root == null) return false;
+        inorder(root);
+        int left = 0, right = res.size() - 1;
+        while (left < right){
+            if (res.get(left) + res.get(right) > k) right--;
+            else if (res.get(left) + res.get(right) < k) left++;
+            else return true;
+        }
+        return false;
+    }
+    private void inorder(TreeNode root) {
+        if (root == null) return;
+        inorder(root.left);
+        res.add(root.val);
+        inorder(root.right);
+    }
+
+    /**
+     * 9. 二叉搜索树的最小绝对差
+     * 给你一个二叉搜索树的根节点 root ，返回 树中任意两不同节点值之间的最小差值 。
+     * 差值是一个正数，其数值等于两值之差的绝对值。
+     * 示例 1：
+     * 输入：root = [4,2,6,1,3]
+     * 输出：1
+     * 示例 2：
+     * 输入：root = [1,0,48,null,null,12,49]
+     * 输出：1
+     */
+    int pre;
+    int ans;
+    public int getMinimumDifference(TreeNode root) {
+        /*if (root == null) return 0;
+        inorder(root);
+        int slow = 0, fast = 1;
+        int minVal = Integer.MAX_VALUE;
+        while (fast < res.size()){
+            minVal = Math.min(minVal, res.get(fast++) - res.get(slow++));
+        }
+        return minVal;*/ // 最朴素的想法，使用一个数组保存遍历出来的有序数组，但是比较慢
+        // TODO: 2022/12/22 使用一个pre变量保存前驱节点的值，这样能够在中序遍历的时候，边遍历边更新答案，不再需要显式创建数组来保存
+        ans = Integer.MAX_VALUE;
+        pre = -1;
+        dfsV3(root);
+        return ans;
+    }
+    private void dfsV3(TreeNode root) {
+        if (root == null) {
+            return;
+        }
+        dfs(root.left);
+        if (pre != -1) {
+            ans = Math.min(ans, root.val - pre);
+        }
+        pre = root.val;
+        dfs(root.right);
+    }
+
+    /**
+     * 10. 二叉搜索树中的众数
+     * 给你一个含重复值的二叉搜索树（BST）的根节点 root ，找出并返回 BST 中的所有 众数（即，出现频率最高的元素）。
+     * 如果树中有不止一个众数，可以按 任意顺序 返回。
+     * 假定 BST 满足如下定义：
+     * 结点左子树中所含节点的值 小于等于 当前节点的值
+     * 结点右子树中所含节点的值 大于等于 当前节点的值
+     * 左子树和右子树都是二叉搜索树
+     * 示例 1：
+     * 输入：root = [1,null,2,2]
+     * 输出：[2]
+     * 示例 2：
+     * 输入：root = [0]
+     * 输出：[0]
+     */
+    private int curCnt = 1;
+    private int maxCnt = 1;
+    private TreeNode preNode = null;
+
+    public int[] findMode(TreeNode root) {
+        /*if (root == null) return new int[0];
+        if (root.left == null && root.right == null) return new int[]{root.val};
+        inorder(root);
+//        res.addAll(Arrays.asList(2,2,4,6,6,7,8,9));
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int key : res) {
+            if (map.containsKey(key)) {
+                int val = map.get(key);
+                map.put(key, ++val);
+            } else {
+                map.put(key, 1);
+            }
+        }
+        ArrayList<Map.Entry<Integer,Integer>> entries= sortMap(map);
+        List<Integer> ans = new ArrayList<>();
+        ans.add(entries.get(0).getKey());
+        for (int i = 1; i < entries.size(); i++) {
+            Integer preValue = entries.get(i-1).getValue();
+            Integer curValue = entries.get(i).getValue();
+            if (curValue >= preValue) {
+                ans.add(entries.get(i).getKey());
+            }else break;
+        }
+        int[] ret = new int[ans.size()];
+        for (int i = 0; i < ret.length; i++) {
+            ret[i] = ans.get(i);
+        }
+        return ret;*/ // 显然这样太慢了
+        // TODO: 2022/12/22
+        List<Integer> maxCntNums = new ArrayList<>(); // 用来存储众数节点值
+        inOrder(root, maxCntNums); // 不是中序遍历出来得到结果后再处理，而是在中序遍历的过程中进行处理
+        int[] ret = new int[maxCntNums.size()]; // 将结果存到数组中
+        int idx = 0;
+        for (int num : maxCntNums) {
+            ret[idx++] = num;
+        }
+        return ret;
+    }
+
+    private void inOrder(TreeNode node, List<Integer> nums) {
+        if (node == null) return;
+        inOrder(node.left, nums);
+        if (preNode != null) {
+            if (preNode.val == node.val) curCnt++;
+            else curCnt = 1;
+        }
+        if (curCnt > maxCnt) {
+            maxCnt = curCnt;
+            nums.clear();
+            nums.add(node.val);
+        } else if (curCnt == maxCnt) {
+            nums.add(node.val);
+        }
+        preNode = node;
+        inOrder(node.right, nums);
+    }
+    private ArrayList<Map.Entry<Integer, Integer>> sortMap(Map<Integer, Integer> map) {
+        ArrayList<Map.Entry<Integer, Integer>> entries = new ArrayList<>(map.entrySet());
+        Collections.sort(entries, new Comparator<Map.Entry<Integer, Integer>>() {
+            @Override
+            public int compare(Map.Entry<Integer, Integer> obj1 , Map.Entry<Integer, Integer> obj2) {
+                return obj2.getValue() - obj1.getValue();
+            }
+        });
+        return entries;
+    }
+
 }

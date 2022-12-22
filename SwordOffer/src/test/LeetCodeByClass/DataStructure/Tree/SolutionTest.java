@@ -4,6 +4,8 @@ import LeetCodeByClass.DataStructure.Tree.Solution;
 import LeetCodeByClass.DataStructure.Tree.TreeNode;
 import org.junit.Test;
 
+import java.util.Arrays;
+
 /** 
 * Solution Tester. 
 * 
@@ -66,6 +68,12 @@ try {
 } catch(InvocationTargetException e) { 
 } 
 */ 
-} 
+}
+
+@Test
+public void testFindMode() throws Exception {
+    Solution s = new Solution();
+    System.out.println(Arrays.toString(s.findMode(new TreeNode(1))));
+}
 
 } 
