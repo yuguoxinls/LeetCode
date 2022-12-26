@@ -42,6 +42,23 @@ public void testLongestPalindrome() {
     String s = "abccccdd";
     System.out.println(solution.longestPalindrome(s));
 }
+@Test
+public void testIsIsomorphic(){
+    System.out.println(solution.isIsomorphic("add", "egg"));
+}
+
+@Test
+public void testCountSubstrings(){
+    System.out.println(solution.countSubstrings("aaa"));
+}
+
+@Test
+public void testCountBinarySubstrings(){
+    System.out.println(solution.countBinarySubstrings("00111011"));
+}
+
+
+
 
 
 } 
