@@ -45,5 +45,15 @@ public void testFindShortestSubArray(){
     System.out.println(solution.findShortestSubArray(new int[]{1,3,2,2,3,1}));
 }
 
+@Test
+public void testisToeplitzMatrix(){
+    System.out.println(solution.isToeplitzMatrix(new int[][]{{1, 2, 3, 4}, {5, 1, 2, 3}, {9, 5, 1, 2}}));
+}
+
+@Test
+public void testArrayNesting(){
+    System.out.println(solution.arrayNesting(new int[]{5, 4, 0, 3, 1, 6, 2}));
+}
+
 
 } 

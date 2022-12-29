@@ -242,7 +242,7 @@ public class Solution {
      * 数组的度是 3 ，因为元素 2 重复出现 3 次。
      * 所以 [2,2,3,1,4,2] 是最短子数组，因此返回 6 。
      */
-    public int findShortestSubArray(int[] nums) {
+    public int findShortestSubArray(int[] nums) { // TODO: 2022/12/29
         Map<Integer, int[]> map = new HashMap<>();
         int n = nums.length;
         for (int i = 0; i < n; i++) {
@@ -267,5 +267,135 @@ public class Solution {
         }
         return minLen;
     }
+
+    /**
+     * 9. 托普利茨矩阵
+     * 给你一个 m x n 的矩阵 matrix 。如果这个矩阵是托普利茨矩阵，返回 true ；否则，返回 false 。
+     * 如果矩阵上每一条由左上到右下的对角线上的元素都相同，那么这个矩阵是 托普利茨矩阵 。
+     * 示例 1：
+     * 输入：matrix = [[1,2,3,4],[5,1,2,3],[9,5,1,2]]
+     * 输出：true
+     * 解释：
+     * 在上述矩阵中, 其对角线为:
+     * "[9]", "[5, 5]", "[1, 1, 1]", "[2, 2, 2]", "[3, 3]", "[4]"。
+     * 各条对角线上的所有元素均相同, 因此答案是 True 。
+     * 示例 2：
+     * 输入：matrix = [[1,2],[2,2]]
+     * 输出：false
+     * 解释：
+     * 对角线 "[1, 2]" 上的元素不同。
+     */
+    public boolean isToeplitzMatrix(int[][] matrix) {
+        int m = matrix.length, n = matrix[0].length;
+        for (int i = 0; i < n; i++) {
+            int curNum = matrix[0][i];
+            int row = 0, col = i;
+            while (row < m && col < n){
+                if (matrix[row][col] != curNum) return false;
+                row++;
+                col++;
+            }
+        }
+        for (int i = 1; i < m; i++) {
+            int curNum = matrix[i][0];
+            int row = i, col = 0;
+            while (row < m && col < n){
+                if (matrix[row][col] != curNum) return false;
+                row++;
+                col++;
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 10. 数组嵌套
+     * 索引从0开始长度为N的数组A，包含0到N - 1的所有整数。找到最大的集合S并返回其大小，其中 S[i] = {A[i], A[A[i]], A[A[A[i]]], ... }且遵守以下的规则。
+     * 假设选择索引为i的元素A[i]为S的第一个元素，S的下一个元素应该是A[A[i]]，之后是A[A[A[i]]]... 以此类推，不断添加直到S出现重复的元素。
+     * 示例 1:
+     * 输入: A = [5,4,0,3,1,6,2]
+     * 输出: 4
+     * 解释:
+     * A[0] = 5, A[1] = 4, A[2] = 0, A[3] = 3, A[4] = 1, A[5] = 6, A[6] = 2.
+     * 其中一种最长的 S[K]:
+     * S[0] = {A[0], A[5], A[6], A[2]} = {5, 6, 2, 0}
+     */
+    public int arrayNesting(int[] nums) {
+        /*List<Integer> tmp;
+        int maxLen = 0;
+        for (int num : nums) {
+            tmp = new ArrayList<>();
+            tmp.add(num);
+            while (!tmp.contains(nums[tmp.get(tmp.size() - 1)])){
+                tmp.add(nums[tmp.get(tmp.size() - 1)]);
+            }
+            maxLen = Math.max(maxLen, tmp.size());
+        }
+        return maxLen;*/ // 暴力求解，直接超时
+        // TODO: 2022/12/29
+        //  方法一：图
+        //  遍历数组，从 i 向 nums[i] 连边，我们可以得到一张有向图。
+        //  由于题目保证 nums 中不含有重复的元素，因此有向图中每个点的出度和入度均为 1。
+        //  在这种情况下，有向图必然由一个或多个环组成。我们可以遍历 nums，找到节点个数最大的环。
+        //  代码实现时需要用一个 vis 数组来标记访问过的节点。
+        /*int max = 0, n = nums.length;
+        boolean[] visited = new boolean[n];
+        for (int i = 0; i < nums.length; i++) {
+            int count = 0;
+            while (!visited[i]){
+                visited[i] = true;
+                i = nums[i];
+                count++;
+            }
+            max = Math.max(max, count);
+        }
+        return max;*/
+        // 方法二：原地标记
+        // 利用「nums 中的元素大小在 [0,n−1] 之间」这一条件，我们可以省略 vis 数组，改为标记 nums[i]=n，来实现和 vis 数组同样的功能。
+        int max = 0, n = nums.length;
+        for (int i = 0; i < nums.length; i++) {
+            int count = 0;
+            while (nums[i] < n){
+                int num = nums[i];
+                nums[i] = n;
+                i = num;
+                count++;
+            }
+            max = Math.max(max, count);
+        }
+        return max;
+    }
+
+    /**
+     * 11. 最多能完成排序的块
+     * 给定一个长度为 n 的整数数组 arr ，它表示在 [0, n - 1] 范围内的整数的排列。
+     * 我们将 arr 分割成若干 块 (即分区)，并对每个块单独排序。将它们连接起来后，使得连接的结果和按升序排序后的原数组相同。
+     * 返回数组能分成的最多块数量。
+     * 示例 1:
+     * 输入: arr = [4,3,2,1,0]
+     * 输出: 1
+     * 解释:
+     * 将数组分成2块或者更多块，都无法得到所需的结果。
+     * 例如，分成 [4, 3], [2, 1, 0] 的结果是 [3, 4, 0, 1, 2]，这不是有序的数组。
+     * 示例 2:
+     * 输入: arr = [1,0,2,3,4]
+     * 输出: 4
+     * 解释:
+     * 我们可以把它分成两块，例如 [1, 0], [2, 3, 4]。
+     * 然而，分成 [1, 0], [2], [3], [4] 可以得到最多的块数。
+     * 对每个块单独排序后，结果为 [0, 1], [2], [3], [4]
+     */
+    public int maxChunksToSorted(int[] arr) {
+        // TODO: 2022/12/29 这tm纯纯数学，看不出算法思想在哪
+        if (arr == null) return 0;
+        int ret = 0;
+        int right = arr[0];
+        for (int i = 0; i < arr.length; i++) {
+            right = Math.max(right, arr[i]);
+            if (right == i) ret++;
+        }
+        return ret;
+    }
+
 
 }
