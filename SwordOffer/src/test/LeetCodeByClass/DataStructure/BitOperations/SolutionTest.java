@@ -42,5 +42,15 @@ public void testSingleNumber3(){
     System.out.println(Arrays.toString(solution.singleNumber3(new int[]{1, 2, 1, 3, 2, 5})));
 }
 
+@Test
+public void testFindComplement(){
+    System.out.println(solution.findComplement(5));
+}
+
+@Test
+public void testMaxProduct(){
+    System.out.println(solution.maxProduct(new String[]{"abcw", "baz", "foo", "bar", "xtfn", "abcdef"}));
+}
+
 
 } 

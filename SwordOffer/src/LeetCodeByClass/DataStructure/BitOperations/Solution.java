@@ -178,16 +178,16 @@ public class Solution {
     }
 
     /**
-     * 7. 不用额外变量交换两个整数
+     * 6. 不用额外变量交换两个整数
      * a = a ^ b;
      * b = a ^ b;
      * a = a ^ b;
      */
 
     /**
-     * 8. 2 的幂
+     * 7. 2 的幂
      * 给你一个整数 n，请你判断该整数是否是 2 的幂次方。如果是，返回 true ；否则，返回 false 。
-     * 如果存在一个整数 x 使得 n == 2x ，则认为 n 是 2 的幂次方。
+     * 如果存在一个整数 x 使得 n == 2^x ，则认为 n 是 2 的幂次方。
      * 示例 1：
      * 输入：n = 1
      * 输出：true
@@ -216,13 +216,209 @@ public class Solution {
         return n > 0 && (n&(-n)) == n;
     }
 
+    /**
+     * 8. 4的幂
+     * 给定一个整数，写一个函数来判断它是否是 4 的幂次方。如果是，返回 true ；否则，返回 false 。
+     * 整数 n 是 4 的幂次方需满足：存在整数 x 使得 n == 4^x
+     * 示例 1：
+     * 输入：n = 16
+     * 输出：true
+     * 示例 2：
+     * 输入：n = 5
+     * 输出：false
+     * 示例 3：
+     * 输入：n = 1
+     * 输出：true
+     */
+    public boolean isPowerOfFour(int n) {
+        /*if (n <= 0) return false;
+        int count = 0;
+        boolean b = (n & (-n)) == n;
+        if (!b) return false;
+        while (n != 0){
+            int last = n & 1;
+            if (last == 1) break;
+            count++;
+            n >>>= 1;
+        }
+        return count%2 == 0;*/
+        // TODO: 2022/12/31 上面这一堆就在说明一个事，n是整数 并且 n只有一个1，这个1还在奇数位，可以用一句话概括
+        return n > 0 && (n & (n - 1)) == 0 && (n & 0b01010101010101010101010101010101) != 0;
+        // 也可以用正则表达式来匹配
+//        return Integer.toString(n, 4).matches("10*"); // 不过这个巨慢，还不如自己写的那个
+    }
 
+    /**
+     * 9. 交替位二进制数
+     * 给定一个正整数，检查它的二进制表示是否总是 0、1 交替出现：换句话说，就是二进制表示中相邻两位的数字永不相同。
+     * 示例 1：
+     * 输入：n = 5
+     * 输出：true
+     * 解释：5 的二进制表示是：101
+     * 示例 2：
+     * 输入：n = 7
+     * 输出：false
+     * 解释：7 的二进制表示是：111.
+     * 示例 3：
+     * 输入：n = 11
+     * 输出：false
+     * 解释：11 的二进制表示是：1011.
+     */
+    public boolean hasAlternatingBits(int n) {
+        /*int ptr = 1;
+        boolean flag1 = isFlag2(ptr, n, false, 1, 0);
+        boolean flag2 = isFlag2(ptr, n, false, 0, 1);
+        return !flag1 || !flag2;*/
+        // TODO: 2022/12/31 上面自己写的这种也能100%，但是太啰嗦了
+        // 但是下面这种不太好想
+        int a = (n ^ (n >> 1)); // 当n是交替二进制数时，n ^ (n >> 1)的结果每一位都是 1，也就是a的每一位都是 1
+        return (a & (a + 1)) == 0; // a+1 的每一位就都是0，和a &之后，就是0
+    }
+    private boolean isFlag2(int ptr, int tmp, boolean flag, int i, int j) {
+        while (tmp != 0){
+            int last = tmp & 1;
+            if (ptr % 2 != 0 && last == i){
+                ptr++;
+                tmp >>>= 1;
+            }else if (ptr % 2 == 0 && last == j){
+                ptr++;
+                tmp >>>= 1;
+            }else {
+                flag = true;
+                break;
+            }
+        }
+        return flag;
+    }
 
+    /**
+     * 10. 数字的补数
+     * 对整数的二进制表示取反（0 变 1 ，1 变 0）后，再转换为十进制表示，可以得到这个整数的补数。
+     * 例如，整数 5 的二进制表示是 "101" ，取反后得到 "010" ，再转回十进制表示得到补数 2 。
+     * 给你一个整数 num ，输出它的补数。
+     * 示例 1：
+     * 输入：num = 5
+     * 输出：2
+     * 解释：5 的二进制表示为 101（没有前导零位），其补数为 010。所以你需要输出 2 。
+     * 示例 2：
+     * 输入：num = 1
+     * 输出：0
+     * 解释：1 的二进制表示为 1（没有前导零位），其补数为 0。所以你需要输出 0 。
+     */
+    public int findComplement(int num) {
+        int tmp = num, count = 0;
+        while (tmp != 0){
+            count++;
+            tmp >>>= 1;
+        }
+        int help = 0;
+        for (int i = 0; i < count; i++) {
+            help += Math.pow(2,i);
+        }
+        return num ^ help;
+    }
 
+    /**
+     * 11. 两整数之和
+     * 给你两个整数 a 和 b ，不使用 运算符 + 和 - ，计算并返回两整数之和。
+     * 示例 1：
+     * 输入：a = 1, b = 2
+     * 输出：3
+     * 示例 2：
+     * 输入：a = 2, b = 3
+     * 输出：5
+     */
+    public int getSum(int a, int b) {
+        // TODO: 2022/12/31
+        //  首先，考虑两个二进制位相加的四种情况如下：
+        //   0 + 0 = 0
+        //   0 + 1 = 1
+        //   1 + 0 = 1
+        //   1 + 1 = 0 (进位)
+        //  可以发现，对于整数 a 和 b：
+        //   在不考虑进位的情况下，其无进位加法结果为 a⊕b。
+        //   而所有需要进位的位为 a&b，进位后的进位结果为 (a&b)<<1
+        return b == 0 ? a : getSum((a ^ b), (a & b) << 1); // b如果是0的话直接返回a；不是0就要计算a和b的无进位和以及进位，相加即可
+    }
 
+    /**
+     * 12. 最大单词长度乘积
+     * 给你一个字符串数组 words ，找出并返回 length(words[i]) * length(words[j]) 的最大值，并且这两个单词不含有公共字母。如果不存在这样的两个单词，返回 0 。
+     * 示例 1：
+     * 输入：words = ["abcw","baz","foo","bar","xtfn","abcdef"]
+     * 输出：16
+     * 解释：这两个单词为 "abcw", "xtfn"。
+     * 示例 2：
+     * 输入：words = ["a","ab","abc","d","cd","bcd","abcd"]
+     * 输出：4
+     * 解释：这两个单词为 "ab", "cd"。
+     * 示例 3：
+     * 输入：words = ["a","aa","aaa","aaaa"]
+     * 输出：0
+     * 解释：不存在这样的两个单词。
+     */
+    public int maxProduct(String[] words) {
+        // TODO: 2022/12/31 本题的关键在于判断2个单词中是否含有公共字母，可以采用位运算来实现
+        // 对于每个单词，采用一个长为26的掩码来表示哪些字母出现在该单词中，出现的位置记为1
+        // 对于words中的每一对单词，当二者的掩码 & 之后 == 0，说明没有相同的字母
+        // 此时，用这2个单词的长度乘积更新最大长度乘积
+        int len = words.length;
+        int[] masks = new int[len]; // 用来记录每个单词的掩码
+        for (int i = 0; i < words.length; i++) {
+            String word = words[i];
+            int length = word.length();
+            for (int j = 0; j < length; j++) {
+                char curCh = word.charAt(j);
+                int index = curCh - 'a'; // 得到当前字母在掩码中的位置索引：0~25
+                masks[i] |= 1 << index; // 把 1 向左移动 index 个位置，添加到当前掩码中
+            }
+        }
+        int max = 0;
+        for (int i = 0; i < len; i++) {
+            for (int j = i+1; j < len; j++) {
+                if ((masks[i] & masks[j]) == 0) max = Math.max(max, words[i].length()*words[j].length());
+            }
+        }
+        return max;
+    }
 
-
-
+    /**
+     * 13. 比特位计数
+     * 给你一个整数 n ，对于 0 <= i <= n 中的每个 i ，计算其二进制表示中 1 的个数 ，返回一个长度为 n + 1 的数组 ans 作为答案。
+     * 示例 1：
+     * 输入：n = 2
+     * 输出：[0,1,1]
+     * 解释：
+     * 0 --> 0
+     * 1 --> 1
+     * 2 --> 10
+     * 示例 2：
+     * 输入：n = 5
+     * 输出：[0,1,1,2,1,2]
+     * 解释：
+     * 0 --> 0
+     * 1 --> 1
+     * 2 --> 10
+     * 3 --> 11
+     * 4 --> 100
+     * 5 --> 101
+     */
+    public int[] countBits(int n) {
+        int[] ans = new int[n+1];
+        for (int i = 1; i <= n; i++) {
+            int count = 0, tmp = i;
+            while (tmp != 0){
+                /*if ((tmp&1) == 1){
+                    count++;
+                }*/ // 这个地方导致整个程序很慢
+                // TODO: 2022/12/31
+                count += tmp&1;
+                tmp >>>= 1;
+            }
+            ans[i] = count;
+        }
+        return ans;
+    }
 
 
 }
