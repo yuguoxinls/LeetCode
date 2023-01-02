@@ -1,7 +1,6 @@
 package SwordByClass.ArrayAndMatrix;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 public class Solution {
     /**
@@ -94,6 +93,79 @@ public class Solution {
         return res.toString();
     }
 
+    /**
+     * 29. 顺时针打印矩阵
+     * 输入一个矩阵，按照从外向里以顺时针的顺序依次打印出每一个数字。
+     * 示例 1：
+     * 输入：matrix = [[1,2,3],[4,5,6],[7,8,9]]
+     * 输出：[1,2,3,6,9,8,7,4,5]
+     * 示例 2：
+     * 输入：matrix = [[1,2,3,4],[5,6,7,8],[9,10,11,12]]
+     * 输出：[1,2,3,4,8,12,11,10,9,5,6,7]
+     */
+    public int[] spiralOrder(int[][] matrix) {
+        if (matrix.length == 0) return new int[0];
+        int top = 0, bottom = matrix.length-1, left = 0, right = matrix[0].length-1;
+        int[] ans = new int[(bottom+1)*(right+1)];
+        // TODO: 2023/1/2
+        int index = 0;
+        while (true){
+            for (int i = left; i <= right; i++) {
+                ans[index++] = matrix[top][i];
+            }
+            if (++top > bottom) break;
+
+            for (int i = top; i <= bottom; i++) {
+                ans[index++] = matrix[i][right];
+            }
+            if (--right < left) break;
+
+            for (int i = right; i >= left; i--) {
+                ans[index++] = matrix[bottom][i];
+            }
+            if (--bottom < top) break;
+
+            for (int i = bottom; i >= top; i--) {
+                ans[index++] = matrix[i][left];
+            }
+            if (++left > right) break;
+        }
+        return ans;
+    }
+
+    /**
+     * 50. 第一个只出现一次的字符
+     * 在字符串 s 中找出第一个只出现一次的字符。如果没有，返回一个单空格。 s 只包含小写字母。
+     * 示例 1:
+     * 输入：s = "abaccdeff"
+     * 输出：'b'
+     * 示例 2:
+     * 输入：s = ""
+     * 输出：' '
+     */
+    public char firstUniqChar(String s) {
+        // TODO: 2023/1/2 使用hash表
+        // 1. 普通hash表
+        /*Map<Character, Boolean> map = new HashMap<>();
+        char[] chars = s.toCharArray();
+        for (char ch : chars) {
+            map.put(ch, !map.containsKey(ch));
+        }
+        for (char ch : chars) {
+            if (map.get(ch)) return ch;
+        }
+        return ' ';*/
+        // 2. 有序hash表，表中键值对顺序是按照插入顺序排列的
+        Map<Character, Boolean> map = new LinkedHashMap<>();
+        char[] chars = s.toCharArray();
+        for (char ch : chars) {
+            map.put(ch, !map.containsKey(ch));
+        }
+        for (Map.Entry<Character, Boolean> m : map.entrySet()) {
+            if (m.getValue()) return m.getKey();
+        }
+        return ' ';
+    }
 
 
 
