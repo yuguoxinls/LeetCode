@@ -64,7 +64,7 @@ public class Solution {
         // 根据快速排序原理，如果某次哨兵划分后 基准数正好是第 k+1 小的数字 ，那么此时基准数左边的所有数字便是题目所求的 最小的 k 个数 。
         // 根据此思路，考虑在每次哨兵划分后，判断基准数在数组中的索引是否等于 k ，若 true 则直接返回此时数组的前 k 个数字即可。
         if (k >= arr.length) return arr;
-        quickSort2(arr, k, 0, arr.length-1);
+        return quickSort2(arr, k, 0, arr.length-1);
     }
 
     private int[] quickSort2(int[] arr, int k, int left, int right) {
