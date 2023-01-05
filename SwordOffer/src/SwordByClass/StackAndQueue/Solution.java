@@ -66,7 +66,6 @@ public class Solution {
         if (k >= arr.length) return arr;
         return quickSort2(arr, k, 0, arr.length-1);
     }
-
     private int[] quickSort2(int[] arr, int k, int left, int right) {
         // 哨兵划分的时候不变
         int i = left, j = right;
@@ -81,7 +80,6 @@ public class Solution {
         if (i<k) quickSort2(arr, k, i+1, right);
         return Arrays.copyOf(arr,k);
     }
-
     private void quickSort(int[] arr, int left, int right) {
         if (left > right) return; // 递归终止条件
         // 以arr[left]为哨兵，比它小的都放到他左边，大的放右边
@@ -95,10 +93,13 @@ public class Solution {
         quickSort(arr, left, i-1);
         quickSort(arr, i+1, right);
     }
-
     private void swap(int[] arr, int i, int j) {
         int tmp = arr[i];
         arr[i] = arr[j];
         arr[j] = tmp;
     }
+
+    /**
+     * 最后3道题没写
+     */
 }
