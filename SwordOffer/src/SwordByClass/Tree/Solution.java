@@ -1,6 +1,6 @@
 package SwordByClass.Tree;
 
-import java.util.HashMap;
+import java.util.*;
 
 public class Solution {
     /**
@@ -135,5 +135,164 @@ public class Solution {
         if (left.val != right.val) return false;
         return isMirror(left.left, right.right) && isMirror(left.right, right.left);
     }
+
+    /**
+     * 32. 从上到下打印二叉树
+     * 从上到下打印出二叉树的每个节点，同一层的节点按照从左到右的顺序打印。
+     * 例如:
+     * 给定二叉树: [3,9,20,null,null,15,7],
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回：
+     * [3,9,20,15,7]
+     */
+    public int[] levelOrder(TreeNode root) {
+        if (root == null) return new int[0];
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        List<Integer> ans = new ArrayList<>();
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                ans.add(node.val);
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
+            }
+        }
+        int[] res = new int[ans.size()];
+        for (int i = 0; i < res.length; i++) {
+            res[i] = ans.get(i);
+        }
+        return res;
+    }
+
+    /**
+     * 32.2 从上到下打印二叉树 II
+     * 从上到下按层打印二叉树，同一层的节点按从左到右的顺序打印，每一层打印到一行。
+     * 例如:
+     * 给定二叉树: [3,9,20,null,null,15,7],
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回其层次遍历结果：
+     * [
+     *   [3],
+     *   [9,20],
+     *   [15,7]
+     * ]
+     */
+    public List<List<Integer>> levelOrder2(TreeNode root) {
+        List<List<Integer>> ans = new ArrayList<>();
+        if (root == null) return ans;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        while (!queue.isEmpty()){
+            int size = queue.size();
+            List<Integer> subAns = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                subAns.add(node.val);
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
+            }
+            ans.add(subAns);
+        }
+        return ans;
+    }
+
+    /**
+     * 32.3 从上到下打印二叉树 III
+     * 请实现一个函数按照之字形顺序打印二叉树，
+     * 即第一行按照从左到右的顺序打印，第二层按照从右到左的顺序打印，第三行再按照从左到右的顺序打印，其他行以此类推。
+     * 例如:
+     * 给定二叉树: [3,9,20,null,null,15,7],
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回其层次遍历结果：
+     * [
+     *   [3],
+     *   [20,9],
+     *   [15,7]
+     * ]
+     */
+    public List<List<Integer>> levelOrder3(TreeNode root) {
+        List<List<Integer>> ans = new ArrayList<>();
+        if (root == null) return ans;
+        Queue<TreeNode> queue = new LinkedList<>();
+        queue.offer(root);
+        int flag = 1;
+        while (!queue.isEmpty()){
+            /*int size = queue.size();
+            List<Integer> subAns = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                subAns.add(node.val);
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
+            }
+            if (flag % 2 == 0){
+                Deque<Integer> stack = new LinkedList<>();
+                int len = subAns.size();
+                for (int i = 0; i < len; i++) {
+                    stack.push(subAns.remove(0));
+                }
+                while (!stack.isEmpty()){
+                    subAns.add(stack.pop());
+                }
+            }
+            ans.add(subAns);
+            flag++;*/
+            // TODO: 2023/1/7 采用双端队列改造，奇数层偶数层分别从队列两端添加，就不需要后边再用栈倒一下了
+            // 相比于上边的方法，时间上没有提升，空间上有些提升
+            int size = queue.size();
+            LinkedList<Integer> subAns = new LinkedList<>();
+            for (int i = 0; i < size; i++) {
+                TreeNode node = queue.poll();
+                if (ans.size() % 2 == 0) { // 说明前面已经遍历完偶数层了，当前在奇数层，顺序是正常的
+                    subAns.addLast(node.val);
+                }else {
+                    subAns.addFirst(node.val);
+                }
+                if (node.left != null) queue.offer(node.left);
+                if (node.right != null) queue.offer(node.right);
+            }
+            ans.add(subAns);
+        }
+        return ans;
+    }
+
+    /**
+     * 33. 二叉搜索树的后序遍历序列
+     * 输入一个整数数组，判断该数组是不是某二叉搜索树的后序遍历结果。
+     * 如果是则返回 true，否则返回 false。假设输入的数组的任意两个数字都互不相同。
+     * 参考以下这颗二叉搜索树：
+     *      5
+     *     / \
+     *    2   6
+     *   / \
+     *  1   3
+     * 示例 1：
+     * 输入: [1,6,3,2,5]
+     * 输出: false
+     * 示例 2：
+     * 输入: [1,3,2,6,5]
+     * 输出: true
+     */
+//    public boolean verifyPostorder(int[] postorder) {
+//
+//    }
+
+
+
+
 
 }
