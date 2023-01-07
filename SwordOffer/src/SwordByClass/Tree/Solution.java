@@ -287,12 +287,26 @@ public class Solution {
      * 输入: [1,3,2,6,5]
      * 输出: true
      */
-//    public boolean verifyPostorder(int[] postorder) {
-//
-//    }
-
-
-
+    int end; // 倒序遍历的指针，用于指向根节点
+    public boolean verifyPostorder(int[] postorder) {
+        // TODO: 2023/1/7 可以按照给定的数组，按照后序遍历的方式构建一颗二叉搜索树，构建成功后，数组为空，说明给定数组是合法的
+        // 而在实现的时候，不需要真正的构建一颗树，只需要判断是否符合BST结构，符合则移除列表的最后一个元素，不符合直接返回即可。
+        // 这样实现的话，不符合规则提前返回，相当于剪枝了。
+        // 此外，构造顺序是是[根->右->左]，这个点挺关键的，因为数组是后续遍历序列[左->右->根]，而我们是倒序遍历列表的。
+        if (postorder == null || postorder.length == 1) return true;
+        end = postorder.length - 1; // 初始化为整个树的根节点
+        build(postorder, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        return end < 0; // 如果构建成功的话，应该从后往前把整个数组扫了一遍，最后小于0
+    }
+    private void build(int[] postorder, int min, int max) {
+        if (end < 0) return; // 小于0 说明已经扫描完毕数组了
+        int root = postorder[end]; // 获取最后一个节点，当作根节点
+        if (root >= max || root <= min) return; // 根节点的值应该在左右子树之间，因为是二叉搜索树
+        end--; // 到此处说明 min < root < max，end向前移动一个
+        // 前面说过，构造顺序是是[根->右->左]，因为数组是后续遍历序列[左->右->根]，而我们是倒序遍历列表的
+        build(postorder, root, max); // 递归遍历右子树
+        build(postorder, min, root); // 递归遍历左子树
+    }
 
 
 }
