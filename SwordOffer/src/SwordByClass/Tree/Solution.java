@@ -308,5 +308,90 @@ public class Solution {
         build(postorder, min, root); // 递归遍历左子树
     }
 
+    /**
+     * 34. 二叉树中和为某一值的路径
+     * 给你二叉树的根节点 root 和一个整数目标和 targetSum ，找出所有 从根节点到叶子节点 路径总和等于给定目标和的路径。
+     * 示例 1：
+     * 输入：root = [5,4,8,11,null,13,4,7,2,null,null,5,1], targetSum = 22
+     * 输出：[[5,4,11,2],[5,8,4,5]]
+     * 示例 2：
+     * 输入：root = [1,2,3], targetSum = 5
+     * 输出：[]
+     * 示例 3：
+     * 输入：root = [1,2], targetSum = 0
+     * 输出：[]
+     */
+    LinkedList<List<Integer>> ans = new LinkedList<>(); // 存储最后结果
+    LinkedList<Integer> path = new LinkedList<>(); // 存储遍历路径
+    public List<List<Integer>> pathSum(TreeNode root, int target) {
+        // TODO: 2023/1/8 经典的二叉树遍历问题，在遍历的时候，进行回溯
+        backTracing(root, target);
+        return ans;
+    }
+    private void backTracing(TreeNode root, int target) {
+        if (root == null) return; // 已经穿过叶子结点，返回
+        path.add(root.val); // 将当前节点值添加到路径中
+        target -= root.val; // 同时 更新目标值
+        if (target == 0 && root.left == null && root.right == null) {
+            // 当目标值更新为0并且当前节点是叶子结点，将路径添加到结果中
+            ans.add(new LinkedList<>(path));
+        }
+        backTracing(root.left, target); // 先序遍历左右子树
+        backTracing(root.right, target);
+        path.removeLast(); // 回溯的时候要移除最后一个元素
+    }
+
+    /**
+     * 36. 二叉搜索树与双向链表
+     * 输入一棵二叉搜索树，将该二叉搜索树转换成一个排序的循环双向链表。要求不能创建任何新的节点，只能调整树中节点指针的指向。
+     * https://leetcode.cn/problems/er-cha-sou-suo-shu-yu-shuang-xiang-lian-biao-lcof/?favorite=xb9nqhhg
+     */
+    Node pre, head;
+    public Node treeToDoublyList(Node root) {
+        // TODO: 2023/1/8 二叉搜索树的中序遍历是有序的，因此本题少不了中序遍历
+        // 定义两个指针pre，cur，中序遍历的过程中，cur.left = pre, pre.right = cur
+        if (root == null) return null; // 特例处理
+        inOrder(root); // 中序遍历，结束后双向链表已经基本构造完成，只差头尾节点没有链接到一起
+        pre.right = head; // pre此时在最后一个节点，他的右节点应指向头节点
+        head.left = pre; // 头节点的左指针应指向最后一个节点
+        return head; // 返回头节点
+    }
+    private void inOrder(Node cur) { // 中序遍历
+        if (cur == null) return; // 穿过了叶子结点，返回
+        inOrder(cur.left); // 中序遍历左子树
+        if (pre == null){ // pre是null，说明是链表的第一个节点，也就是pre还没背初始化
+            // 此时的节点应该是头节点
+            head = cur;
+        }else {
+            // pre不是null，说明已经是中间的某一个过程了，此时pre是cur的前驱节点
+            pre.right = cur;
+        }
+        cur.left = pre;
+        pre = cur; // 更新前驱节点为当前节点，这一步很重要
+        inOrder(cur.right); // 中序遍历右子树
+    }
+
+    /**
+     * 54. 二叉搜索树的第k大节点
+     * 给定一棵二叉搜索树，请找出其中第 k 大的节点的值
+     */
+    int result = 0, k;
+    public int kthLargest(TreeNode root, int k) {
+        if (root == null) return -1;
+        this.k = k;
+        inOrder2(root);
+        return result;
+    }
+    private void inOrder2(TreeNode root) {
+        if (root == null) return;
+        inOrder2(root.right);
+        // TODO: 2023/1/8 思路是对的，注意下面这两个if语句，做到了提前返回
+        if (k == 0) return;
+        if (--k == 0) {
+            result = root.val;
+        }
+        inOrder2(root.left);
+    }
+
 
 }
