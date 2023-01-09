@@ -393,5 +393,88 @@ public class Solution {
         inOrder2(root.left);
     }
 
+    /**
+     * 55. 二叉树的深度
+     * 输入一棵二叉树的根节点，求该树的深度。从根节点到叶节点依次经过的节点（含根、叶节点）形成树的一条路径，最长路径的长度为树的深度。
+     * 例如：
+     * 给定二叉树 [3,9,20,null,null,15,7]，
+     *
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回它的最大深度 3 。
+     */
+    public int maxDepth(TreeNode root) {
+        if (root == null) return 0;
+        if (root.left == null && root.right == null) return 1;
+        return Math.max(maxDepth(root.left), maxDepth(root.right)) + 1;
+    }
+
+    /**
+     * 55.2 平衡二叉树
+     * 输入一棵二叉树的根节点，判断该树是不是平衡二叉树。如果某二叉树中任意节点的左右子树的深度相差不超过1，那么它就是一棵平衡二叉树。
+     * 示例 1:
+     * 给定二叉树 [3,9,20,null,null,15,7]
+     *     3
+     *    / \
+     *   9  20
+     *     /  \
+     *    15   7
+     * 返回 true 。
+     * 示例 2:
+     * 给定二叉树 [1,2,2,3,3,null,null,4,4]
+     *        1
+     *       / \
+     *      2   2
+     *     / \
+     *    3   3
+     *   / \
+     *  4   4
+     * 返回 false
+     */
+    public boolean isBalanced(TreeNode root) {
+        /*if (root == null || (root.left == null && root.right == null)) return true;
+        return !(Math.abs(maxDepth(root.left) - maxDepth(root.right)) > 1) && isBalanced(root.left) && isBalanced(root.right);*/
+        // TODO: 2023/1/9 可以采用剪枝的方法提前返回
+        // 从底至顶，遍历每个节点，判断以该节点为根的子树是否满足条件，如果不满足直接返回
+        // 采用后序遍历
+        return check(root) != -1; // 只要check不为-1，代表满足条件
+    }
+    private int check(TreeNode root) {
+        if (root == null) return 0; // 穿过了叶子节点，返回
+        int left = check(root.left); // 检查当前节点的左子树深度
+        if (left == -1) return -1; // 如果出现节点深度为-1，则剪枝，开始向上返回，后面的节点不再遍历
+        int right = check(root.right); // 检查当前节点的右子树深度
+        if (right == -1) return -1;// 如果出现节点深度为-1，则剪枝，开始向上返回，后面的节点不再遍历
+        return Math.abs(left - right) < 2 ? Math.max(left, right)+1 : -1; // 满足条件，即平衡，则返回当前节点子树的深度；不满足返回-1
+    }
+
+    /**
+     * 68. 二叉搜索树的最近公共祖先
+     * 给定一个二叉搜索树, 找到该树中两个指定节点的最近公共祖先。
+     * 百度百科中最近公共祖先的定义为：
+     * “对于有根树 T 的两个结点 p、q，最近公共祖先表示为一个结点 x，满足 x 是 p、q 的祖先且 x 的深度尽可能大（一个节点也可以是它自己的祖先）。”
+     * 例如，给定如下二叉搜索树:  root = [6,2,8,0,4,7,9,null,null,3,5]
+     * 示例 1:
+     * 输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 8
+     * 输出: 6
+     * 解释: 节点 2 和节点 8 的最近公共祖先是 6。
+     * 示例 2:
+     * 输入: root = [6,2,8,0,4,7,9,null,null,3,5], p = 2, q = 4
+     * 输出: 2
+     * 解释: 节点 2 和节点 4 的最近公共祖先是 2, 因为根据定义最近公共祖先节点可以为节点本身。
+     */
+    public TreeNode lowestCommonAncestor(TreeNode root, TreeNode p, TreeNode q) {
+        /*if (p.val == root.val || q.val == root.val || (p.val < root.val && q.val > root.val) || (p.val > root.val && q.val < root.val)) return root;
+        if (p.val < root.val) return lowestCommonAncestor(root.left, p, q);
+        else return lowestCommonAncestor(root.right, p, q);*/
+        // TODO: 2023/1/9 换一个写法，没有那么啰嗦，但是逻辑是一样的
+        if (p.val < root.val && q.val < root.val) return lowestCommonAncestor(root.left, p, q);
+        if (p.val > root.val && q.val > root.val) return lowestCommonAncestor(root.right, p, q);
+        return root;
+    }
+
 
 }
