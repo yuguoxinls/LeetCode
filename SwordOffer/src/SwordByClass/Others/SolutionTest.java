@@ -13,4 +13,9 @@ public class SolutionTest {
     public void printNumbers() {
         System.out.println(Arrays.toString(solution.printNumbers(2)));
     }
+
+    @Test
+    public void translateNum() {
+        System.out.println(solution.translateNum(25));
+    }
 }
