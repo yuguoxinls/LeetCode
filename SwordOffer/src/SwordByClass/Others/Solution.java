@@ -18,7 +18,36 @@ public class Solution {
             res[i] = i+1;
         }
         return res;
-        // TODO: 2023/1/16 本题的考点应该在n很大时，int会越界，也就是大数问题
+    }
+    // TODO: 2023/1/16 本题的考点应该在n很大时，int会越界，也就是大数问题
+    // 实际上，当n很大时，无论是int long float double都满足不了要求，因为基本数字类型总会有一个能表示的最大范围
+    // 因此，应该用字符串表示最后的大数结果
+    // 可以先固定高位为0～9，再分别递归低位
+    StringBuilder res;
+    int nine = 0, count = 0, start, n;
+    char[] num, loop = {'0', '1', '2', '3', '4', '5', '6', '7', '8', '9'};
+    public String printNumbers2(int n) {
+        this.n = n;
+        res = new StringBuilder();
+        num = new char[n];
+        start = n - 1;
+        dfs(0);
+        res.deleteCharAt(res.length() - 1);
+        return res.toString();
+    }
+    void dfs(int x) {
+        if(x == n) {
+            String s = String.valueOf(num).substring(start);
+            if(!s.equals("0")) res.append(s + ",");
+            if(n - start == nine) start--;
+            return;
+        }
+        for(char i : loop) {
+            if(i == '9') nine++;
+            num[x] = i;
+            dfs(x + 1);
+        }
+        nine--;
     }
 
     /**
